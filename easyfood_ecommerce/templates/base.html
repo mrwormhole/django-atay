@@ -49,25 +49,28 @@
         {% include 'components/floatingButton.html' %}
         <!--Floating Button-->
 
-        <!--Home Page-->
-        {% block home %}
-        {% endblock home %}
-        <!--Home Page-->
+        <main style="margin-top: 55px;">
+            <!--Home Page-->
+            {% block home %}
+            {% endblock home %}
+            <!--Home Page-->
+        
+            <!--Store Page-->
+            {% block store %}    
+            {% endblock store %}
+            <!--Store Page-->
+            
 
-        <!--Store Page-->
-        {% block store %}    
-        {% endblock store %}
-        <!--Store Page-->
+            <!--Checkout Page-->
+            {% block checkout %}
+            {% endblock checkout %}
+            <!--Checkout Page-->
 
-        <!--Checkout Page-->
-        {% block checkout %}
-        {% endblock checkout %}
-        <!--Checkout Page-->
-
-        <!--Checkout Page-->
-        {% block cart %}
-        {% endblock cart %}
-        <!--Checkout Page-->
+            <!--Checkout Page-->
+            {% block cart %}
+            {% endblock cart %}
+            <!--Checkout Page-->
+        </main>
             
         <!--Footer-->
         {% include 'components/footer.html' %}

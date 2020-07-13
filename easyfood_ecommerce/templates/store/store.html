@@ -1,3 +1,8 @@
 {% extends 'base.html' %}
 
-<h3> STORE </h3>
+{% block store %}
+    {% include 'components/carousel.html' %}
+    {% include 'components/products.html' %}
+    {% include 'components/pagination.html' %}
+{% endblock store %}
+    

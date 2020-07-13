@@ -1,4 +1,4 @@
-<nav class="mb-1 navbar fixed-top navbar-expand-lg navbar-light custom-navbar">
+<nav class="mb-1 navbar fixed-top navbar-expand-lg navbar-light custom-navbar" style="background-color: #25D366;">
     <div class="container" style="max-width: 1200px;">
         <a class="navbar-brand" href="/">
             <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="easy food logo">
@@ -32,12 +32,13 @@
 
                 <li class="nav-item d-flex">
                     <a class="nav-link custom-button d-flex justify-content-center align-items-center" href="{% url 'cart' %}">
-                        <i class="fas fa-shopping-cart"> 0</i>
+                        <i class="fas fa-shopping-cart"> </i>
+                        <span class="badge red z-depth-1 mr-1"> 1 </span>
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link custom-button btn btn-warning " href="">
+                <li class="nav-item d-flex">
+                    <a class="nav-link custom-button btn btn-warning py-2 my-0 d-flex justify-content-center align-items-center " href="">
                         Login
                     </a>
                 </li>
