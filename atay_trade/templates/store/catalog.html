@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} - Catalog {% endblock %}
+
+{% block store %}
+    {% include 'components/breadcrumbArea.html' with title="dresses" %}
+    {% include 'components/shopGridArea.html' %}
+{% endblock store %}

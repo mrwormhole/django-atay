@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} - Checkout {% endblock %}
+
+{% block store %}
+    {% include 'components/breadcrumbArea.html' with title="checkout" %}
+    {% include 'components/checkoutArea.html' %}    
+{% endblock store %}
+    

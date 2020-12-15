@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+
+    <!-- Core Style CSS -->
+    <link rel="stylesheet" href="{% static 'css/core-style.css' %}">
+    <!-- Custom Icon -->
+    <link rel="icon" href="{% static 'img/core-img/favicon.ico' %}">
+
+    {% block scoped_css %}    
+    {% endblock scoped_css %}
+
+    <title> Atay Trade {% block title %} - Home {% endblock %} </title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    {% include 'components/navbar.html' %}
+    <!-- Navbar -->
+
+    <!-- Dynamic Cart -->
+    {% include 'components/dynamicCart.html' %}
+    <!-- Dynamic Cart -->
+
+    <!-- Store Domain -->
+    {% block store %}
+    {% endblock store %}
+    <!-- Store Domain -->
+
+    <!--Footer-->
+    {% include 'components/footer.html' %}
+    <!--Footer-->
+
+    <!-- jQuery (Necessary for All JavaScript Plugins) -->
+    <script  type="text/javascript" src="{% static 'js/jquery/jquery-2.2.4.min.js' %}"></script>
+    <!-- Popper js -->
+    <script  type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
+    <!-- Bootstrap js -->
+    <script  type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- Plugins js -->
+    <script  type="text/javascript" src="{% static 'js/plugins.js' %}"></script>
+    <!-- Classy Nav js -->
+    <script  type="text/javascript" src="{% static 'js/classy-nav.min.js' %}"></script>
+    <!-- Active js -->
+    <script  type="text/javascript" src="{% static 'js/active.js' %}"></script>
+
+    {% block scoped_js %}    
+    {% endblock scoped_js %}
+
+</body>
+
+</html>

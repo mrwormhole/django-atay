@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} - Contact {% endblock %}
+
+{% block store %}
+    {% include 'components/contactInfo.html' %}    
+{% endblock store %}
+
+{% block scoped_js %}
+    <!-- Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwuyLRa1uKNtbgx6xAJVmWy-zADgegA2s"></script>
+    <script src="{% static 'js/map-active.js' %}"></script>
+{% endblock scoped_js %}
+    
+    
