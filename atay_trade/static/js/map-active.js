@@ -1,4 +1,4 @@
-// TODO this file will be removed
+// TODO this file will be removed, 'img/core-img/pin.png' will be removed once this file is removed
 var map;
 var latlng = new google.maps.LatLng(51.5074, 0.1278);
 var stylez = [
