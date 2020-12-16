@@ -1,3 +1,4 @@
+// TODO this file will be removed
 var map;
 var latlng = new google.maps.LatLng(51.5074, 0.1278);
 var stylez = [
