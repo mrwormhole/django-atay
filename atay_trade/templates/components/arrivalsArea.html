@@ -16,6 +16,7 @@
             <div class="col-12">
                 <div class="popular-products-slides owl-carousel">
 
+                    {% for product in products %}
                     <!-- Single Product -->
                     <div class="single-product-wrapper">
                         <!-- Product Image -->
@@ -32,9 +33,9 @@
                         <div class="product-description">
                             <span>topshop</span>
                             <a href="single-product-details.html">
-                                <h6>Knot Front Mini Dress</h6>
+                                <h6>{{product.name}}</h6>
                             </a>
-                            <p class="product-price">$80.00</p>
+                            <p class="product-price">£{{product.price|floatformat:2}}</p>
 
                             <!-- Hover Content -->
                             <div class="hover-content">
@@ -45,6 +46,8 @@
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
+                        
 
                     <!-- Single Product -->
                     <div class="single-product-wrapper">
