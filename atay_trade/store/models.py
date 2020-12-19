@@ -12,7 +12,7 @@ class Customer(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100, null=True)
     price = models.FloatField()
-    #product model no will be here
+    model_number = models.CharField(max_length=100, null=True)
     #sale percentage off will be here
     #boolean is it a new thing will be here
     #category name or brand name will be here
