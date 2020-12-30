@@ -9,28 +9,42 @@ class Customer(models.Model):
     def __str__(self):
         return self.name
 
-class Product(models.Model):
-    name = models.CharField(max_length=100, null=True)
-    price = models.FloatField()
-    model_number = models.CharField(max_length=100, null=True)
-    #sale percentage off will be here
-    #boolean is it a new thing will be here
-    #category name or brand name will be here
+class Category(models.Model):
+    name = models.CharField(max_length=50, null=True)
 
+    class Meta:
+        verbose_name_plural = "Categories"
+        
     def __str__(self):
         return self.name
+
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True)
+    price = models.FloatField()
+    model_number = models.CharField(max_length=100, null=True, unique=True)
+    date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    #sale percentage off will be here
+    #stock can be here too
+
+    #def get_upload_path(self):
+    #    return "products/" + self.model_number
+
+    def __str__(self):
+        return self.name + " " + str(self.model_number)
 
 class ProductImage(models.Model):
     # TODO images will have a better defined path like resources/media/productName/
     # TODO this class will have a get_image_url method for all of the images and an image thumbnail for cart
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
+    #upload_to= Product.get_upload_path(product) 
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
-    transaction_id = models.CharField(max_length=100, null=True)
+    transaction_id = models.CharField(max_length=100, null=True, unique=True)
 
     def __str__(self):
         return str(self.id)
