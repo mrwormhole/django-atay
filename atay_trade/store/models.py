@@ -19,13 +19,13 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=100, null=True)
     price = models.FloatField()
     model_number = models.CharField(max_length=100, null=True, unique=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    #sale percentage off will be here
-    #stock can be here too
+    #sale percentage off will be here(how much money discount should it be applied to)
+    #stock can be here too(how many quantities can be bought)
 
     #def get_upload_path(self):
     #    return "products/" + self.model_number
@@ -50,18 +50,18 @@ class Order(models.Model):
         return str(self.id)
 
     @property
-    def get_cart_total(self):
-        orderitems = self.orderitem_set.all()
+    def get_cart_total_price(self):
+        orderitems = self.order_items.all()
         return sum([item.get_total for item in orderitems])
     
     @property
     def get_cart_items_count(self):
-        orderitems = self.orderitem_set.all()
+        orderitems = self.order_items.all()
         return sum([item.quantity for item in orderitems])
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    product = models.OneToOneField(Product, on_delete=models.SET_NULL, null=True, blank=True) #dont like this reverse shit
+    order = models.ForeignKey(Order, related_name="order_items", on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 

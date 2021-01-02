@@ -1,17 +1,33 @@
-from .models import Order, OrderItem, Product
+from .models import Order, OrderItem, Product, ProductImage
 from rest_framework import serializers
 
-class OrderSerializer(serializers.ModelSerializer):
+class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
-        fields = []
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = []
+        model = ProductImage
+        fields = ["image"]
 
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageSerializer(many = True, read_only = True)
     class Meta:
         model = Product
-        fields = []
+        fields = ["id", "category", "name", "price", "model_number", "date_added", "images"]
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(many=False, read_only = True)
+    class Meta:
+        model = OrderItem
+        fields = ["product", "order", "quantity", "date_added", "product"]
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+    items_count = serializers.SerializerMethodField()
+    class Meta:
+        model = Order
+        fields = ["customer", "total_price", "items_count", "date_ordered", "complete", "transaction_id", "order_items"]
+    
+    def get_total_price(self, obj):
+        return obj.get_cart_total_price
+    
+    def get_items_count(self, obj):
+        return obj.get_cart_items_count
