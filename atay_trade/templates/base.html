@@ -23,6 +23,11 @@
     {% block scoped_css %}    
     {% endblock scoped_css %}
 
+    <script type="text/javascript">
+        // this is a trick to give user variable to jquery side
+        var user = "{{request.user}}";
+    </script>
+
     <title> Atay Trade {% block title %} - Home {% endblock %} </title>
 </head>
 

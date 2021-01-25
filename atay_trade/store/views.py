@@ -5,6 +5,8 @@ from .serializers import *
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
+from django.http import Http404
 
 def store(request):
     products = Product.objects.all()
@@ -28,16 +30,66 @@ def cart(request):
 '''
 
 class CartList(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
+        if request.user.is_authenticated == False:
+            return Response({})
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
         serializer = OrderSerializer(order)
         serializer_data = serializer.data
         return Response(serializer.data)
 
+    def post(self, request, format=None):
+        if request.user.is_authenticated == False:
+            return
 
+    '''
+    def delete(self, request, format=None):
+        if request.user.is_authenticated == False:
+            return   
+    '''
+
+class CartAdd(APIView):
+
+    def post(self, request, format=None):
+        productID = request.data["productID"]
+        product = Product.objects.get(id = productID)
+
+        if request.user.is_authenticated == False:
+            return Response({})
+        
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        orderItem, created = OrderItem.objects.get_or_create(order = order, product = product)
+        orderItem.quantity = orderItem.quantity + 1
+        orderItem.save()
+        
+        serializer = OrderSerializer(order)
+        serializer_data = serializer.data
+        return Response(serializer_data)
+
+        
+
+class CartRemove(APIView):
+
+    def delete(self, request, format=None):
+        product = Product.objects.filter(pk = request.data["id"])
+
+        if request.user.is_authenticated == False:
+            return Response({})
+        
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+        orderItem.delete()
+
+        serializer = OrderSerializer(order)
+        serializer_data = serializer.data
+        return Response(serializer.data)
+        
+
+        
 def checkout(request):
     if request.user.is_authenticated:
         customer = request.user.customer
