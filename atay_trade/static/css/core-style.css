@@ -1,6 +1,6 @@
 /* [Master Stylesheet v-1.0.0] */
 /* :: 1.0 Import Web Fonts */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Ubuntu:300,400,500,700");
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Ubuntu:300,400,500,700|Courgette:400");
 /* :: 2.0 Import All CSS */
 @import url(../css/classy-nav.min.css);
 @import url(../css/owl.carousel.css);
@@ -1745,5 +1745,11 @@ img {
           font-weight: 300; }
           .contact-area .contact-info .contact-address p:last-child a:hover {
             color: #0315ff; }
+
+@media only screen and (max-width: 767px) {
+  .count-cart {
+    font-size: 12px !important;
+  }
+}
 
 /* ##### The End ##### */

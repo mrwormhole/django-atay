@@ -29,10 +29,7 @@ $(document).ready(function(){
         }
     });
 
-    // get for the cart
-    document.getElementsByClassName('get-cart')[0].addEventListener('click', function(e) {
-        e.preventDefault();
-        //populate the cart
+    function populateTheCart() {
         $.ajax({
             type: "GET",
             url: "http://localhost:8000/cart/",
@@ -42,13 +39,17 @@ $(document).ready(function(){
 
                 let total = data["total_price"];
                 $('.summary-total').text("£" + total);
+                $('.count-cart').text(data["items_count"]);
+
+                console.log(data);
+                let image = data["order_items"][0]["product"]["images"][0]["image"];
 
                 let productsCount = data["order_items"].length;
                 for(let i = 0; i < productsCount; i++) {
                     $(".cart-list").append(
                     `<div class="single-cart-item">
                         <a href="#" class="product-image">
-                            <img src=${'static/img/product-img/product-2.jpg'} class="cart-thumb" alt="product cart image">
+                            <img src=${'/static/img/product-img/product-2.jpg'} class="cart-thumb" alt="product cart image">
                         
                             <div class="cart-item-desc">
                             <button data-product="${data["order_items"][i]["product"]["id"]}" data-action="remove" class="product-remove remove-cart" style="background-color: transparent;border: none;"><i class="fa fa-close" aria-hidden="true"></i></button>
@@ -62,17 +63,55 @@ $(document).ready(function(){
                     </div>`);
                 }
 
-                console.log(data);
-                let image = data["order_items"][0]["product"]["images"][0]["image"];
+
+                //remove buttons
+                let removeButtons = document.getElementsByClassName('remove-cart');
+                for (let i = 0; i < removeButtons.length; i++) {
+                    removeButtons[i].addEventListener('click', function(e) {
+                        e.preventDefault();
+                        let productID = this.dataset.product;
+                        let action = this.dataset.action;
+                        console.log("productID: ", productID, "Action: ", action);
+
+                        console.log("user:", user);
+                        if (user == "AnonymousUser") {
+                            console.log("user is not authenticated");
+                        } else {
+                            console.log("deleting...");
+                            /*$.ajax({
+                                type: "DELETE",
+                                url: "http://localhost:8000/cart/remove/",
+                                data: JSON.stringify({"productID": productID}),
+                                contentType: "application/json",
+                                success: function(data) {
+                                    console.log(data);
+                                },
+                                error: function(data, err) {
+                                    console.log("ERR: ", err);
+                                    console.log(data)
+                                }
+                            });*/
+                        }
+                    });
+                }
             },
             error: function(data, err) {
                 console.log("ERR: ", err);
                 console.log(data);
             }
         });
-    })
+    }
 
-    // add to the cart
+    populateTheCart();
+
+    // get for the cart
+    document.getElementsByClassName('get-cart')[0].addEventListener('click', function(e) {
+        e.preventDefault();
+        //populate the cart
+        populateTheCart();
+    });
+
+    // add buttons
     let addButtons = document.getElementsByClassName('add-cart');
     for (let i = 0; i < addButtons.length; i++) {
         addButtons[i].addEventListener('click', function(e) {
@@ -103,33 +142,4 @@ $(document).ready(function(){
         });
     }
 
-    //remove from the cart
-    let removeButtons = document.getElementsByClassName('remove-cart');
-    for (let i = 0; i < removeButtons.length; i++) {
-        removeButtons[i].addEventListener('click', function(e) {
-            e.preventDefault();
-            let productID = this.dataset.product;
-            let action = this.dataset.action;
-            console.log("productID: ", productID, "Action: ", action);
-
-            console.log("user:", user);
-            if (user == "AnonymousUser") {
-                console.log("user is not authenticated");
-            } else {
-                /*$.ajax({
-                    type: "DELETE",
-                    url: "http://localhost:8000/cart/remove/",
-                    data: JSON.stringify({"productID": productID}),
-                    contentType: "application/json",
-                    success: function(data) {
-                        console.log(data);
-                    },
-                    error: function(data, err) {
-                        console.log("ERR: ", err);
-                        console.log(data)
-                    }
-                });*/
-            }
-        });
-    }
 });

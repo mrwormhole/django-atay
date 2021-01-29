@@ -6,7 +6,7 @@
 
      <!-- Cart Button -->
      <div class="cart-button">
-         <a href="#" id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span>3</span></a>
+         <a id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span class="count-cart"></span></a>
      </div>
 
      <div class="cart-content d-flex">
@@ -20,13 +20,13 @@
 
              <h2>Summary</h2>
              <ul class="summary-table">
-                 <li><span>subtotal:</span> <span class="summary-total">£0.00</span></li>
+                 <li><span>subtotal:</span> <span class="summary-total"></span></li>
                  <li><span>delivery:</span> <span>Free</span></li>
                  <!--<li><span>discount:</span> <span>-15%</span></li>-->
-                 <li><span>total:</span> <span class="summary-total">£0.00</span></li>
+                 <li><span>total:</span> <span class="summary-total"></span></li>
              </ul>
              <div class="checkout-btn mt-100">
-                 <a href="checkout.html" class="btn essence-btn">check out</a>
+                 <a href="{% url 'store:checkout' %}" class="btn essence-btn">check out</a>
              </div>
          </div>
      </div>

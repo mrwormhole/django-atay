@@ -35,10 +35,17 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     # TODO images will have a better defined path like resources/media/productName/
-    # TODO this class will have a get_image_url method for all of the images and an image thumbnail for cart
+    # product images size has to be 1000 x 972 (kinda like horizontal wide square)
+
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
     #upload_to= Product.get_upload_path(product) 
+
+class ProductThumbnailImage(models.Model):
+    # product thumbnails size has to be 1000 x 1364 (kinda like vertical wide rectangle)
+
+    product = models.ForeignKey(Product, related_name="thumbnails", on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ImageField(upload_to= , null=True, blank=True)
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
