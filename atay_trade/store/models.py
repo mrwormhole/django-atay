@@ -52,7 +52,7 @@ class Order(models.Model):
     @property
     def get_cart_total_price(self):
         orderitems = self.order_items.all()
-        return sum([item.get_total for item in orderitems])
+        return round(sum([item.get_total for item in orderitems]), 2)
     
     @property
     def get_cart_items_count(self):
@@ -67,7 +67,7 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        return self.product.price * self.quantity
+        return round(self.product.price * self.quantity, 2)
 
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
