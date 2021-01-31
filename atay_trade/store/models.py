@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill, ResizeCanvas
+from datetime import datetime
+import pytz
 
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -24,28 +28,28 @@ class Product(models.Model):
     price = models.FloatField()
     model_number = models.CharField(max_length=100, null=True, unique=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    #sale percentage off will be here(how much money discount should it be applied to)
-    #stock can be here too(how many quantities can be bought)
-
-    #def get_upload_path(self):
-    #    return "products/" + self.model_number
+    #TODO: sale percentage off will be here(how much money discount should it be applied to)
+    #TODO: stock can be here too(how many quantities can be bought)
+    #TODO: wishlist is designed for db but not added yet
 
     def __str__(self):
         return self.name + " " + str(self.model_number)
 
+def upload_to(folder_name):
+    now = datetime.now(pytz.utc)
+    return f"{folder_name}/{now:%Y/%m}/"
+
 class ProductImage(models.Model):
-    # TODO images will have a better defined path like resources/media/productName/
     # product images size has to be 1000 x 972 (kinda like horizontal wide square)
-
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ImageField(null=True, blank=True)
-    #upload_to= Product.get_upload_path(product) 
+    image = models.ImageField(upload_to=upload_to("product_images") ,null=True, blank=True)
+    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(1000,972)], format="JPEG", options={"quality": 80}) 
 
-class ProductThumbnailImage(models.Model):
+class ProductThumbnail(models.Model):
     # product thumbnails size has to be 1000 x 1364 (kinda like vertical wide rectangle)
-
     product = models.ForeignKey(Product, related_name="thumbnails", on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ImageField(upload_to= , null=True, blank=True)
+    image = models.ImageField(upload_to=upload_to("product_thumbnails") , null=True, blank=True)
+    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(1000,1364)], format="JPEG", options={"quality": 80})
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)

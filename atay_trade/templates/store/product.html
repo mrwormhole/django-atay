@@ -4,5 +4,5 @@
 {% block title %} - Product {% endblock %}
 
 {% block store %}
-    {% include 'components/productDetailArea.html' %}
+    {% include 'components/productDetailArea.html' with product=product %}
 {% endblock store %}

@@ -86,6 +86,6 @@ def catalog(request):
 
 def product(request, id):
     product = get_object_or_404(Product, pk=id)
-    print(product)
-    context = {"product": product}
+    productImages = product.images.all()
+    context = {"product": product, "productImages": productImages}
     return render(request, "store/product.html", context)

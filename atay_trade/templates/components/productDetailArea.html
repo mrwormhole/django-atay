@@ -6,9 +6,9 @@
     <!-- Single Product Thumb -->
     <div class="single_product_thumb clearfix">
         <div class="product_thumbnail_slides owl-carousel">
-            <img src="{% static 'img/product-img/product-big-1.jpg' %}" alt="">
-            <img src="{% static 'img/product-img/product-big-1.jpg' %}" alt="">
-            <img src="{% static 'img/product-img/product-big-1.jpg' %}" alt="">
+            {% for productImage in productImages %}
+                <img src="{{ productImage.resized_image.url }}" alt="">
+            {% endfor %}
         </div>
     </div>
 
@@ -16,9 +16,9 @@
     <div class="single_product_desc clearfix">
         <span>mango</span>
         <a href="cart.html">
-            <h2>One Shoulder Glitter Midi Dress</h2>
+            <h2>{{ product.name }}</h2>
         </a>
-        <p class="product-price"><span class="old-price">$65.00</span> $49.00</p>
+        <p class="product-price"><!--<span class="old-price">£{{product.price}}</span>--> £{{product.price}} </p>
         <p class="product-desc">Mauris viverra cursus ante laoreet eleifend. Donec vel fringilla ante. Aenean finibus velit id urna vehicula, nec maximus est sollicitudin.</p>
 
         <!-- Form -->

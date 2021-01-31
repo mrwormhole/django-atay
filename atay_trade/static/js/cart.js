@@ -42,7 +42,7 @@ $(document).ready(function(){
                 $('.count-cart').text(data["items_count"]);
 
                 console.log(data);
-                let image = data["order_items"][0]["product"]["images"][0]["image"];
+                //let image = data["order_items"][0]["product"]["images"][0]["image"];
 
                 let productsCount = data["order_items"].length;
                 for(let i = 0; i < productsCount; i++) {

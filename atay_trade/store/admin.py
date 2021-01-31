@@ -14,8 +14,12 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 3
 
-class ProductAdmin(admin.ModelAdmin):
-    inlines = [ ProductImageInline ]
+class ProductThumbnailInline(admin.TabularInline):
+    model = ProductThumbnail
+    max_num = 2
 
-admin.site.register(Product, ProductAdmin)
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [ ProductThumbnailInline, ProductImageInline ]
+
+admin.site.register(Product, ProductAdmin)  
 admin.site.register(Category)

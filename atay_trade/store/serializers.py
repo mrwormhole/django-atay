@@ -1,5 +1,10 @@
-from .models import Order, OrderItem, Product, ProductImage
+from .models import Order, OrderItem, Product, ProductImage, ProductThumbnail
 from rest_framework import serializers
+
+class ProductThumbnailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductThumbnail
+        fields = ["image"]
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,10 +12,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ["image"]
 
 class ProductSerializer(serializers.ModelSerializer):
+    thumbnails = ProductThumbnailSerializer(many = True, read_only= True)
     images = ProductImageSerializer(many = True, read_only = True)
     class Meta:
         model = Product
-        fields = ["id", "category", "name", "price", "model_number", "date_added", "images"]
+        fields = ["id", "category", "name", "price", "model_number", "date_added", "images", "thumbnails"]
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False, read_only = True)
