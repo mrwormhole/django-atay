@@ -28,8 +28,9 @@ class Product(models.Model):
     price = models.FloatField()
     model_number = models.CharField(max_length=100, null=True, unique=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    stock = models.IntegerField(default=0, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     #TODO: sale percentage off will be here(how much money discount should it be applied to)
-    #TODO: stock can be here too(how many quantities can be bought)
     #TODO: wishlist is designed for db but not added yet
 
     def __str__(self):
@@ -69,6 +70,17 @@ class Order(models.Model):
     def get_cart_items_count(self):
         orderitems = self.order_items.all()
         return sum([item.quantity for item in orderitems])
+    
+    @property
+    def get_availability_from_stock(self):
+        is_available_in_stock = True
+        products_that_are_not_available = []
+        orderitems = self.order_items.all()
+        for oi in orderitems:
+            if oi.product.stock < oi.quantity:
+                is_available_in_stock = False
+                products_that_are_not_available.append(oi.product)
+        return is_available_in_stock, products_that_are_not_available   
 
 class OrderItem(models.Model):
     product = models.OneToOneField(Product, on_delete=models.SET_NULL, null=True, blank=True) #dont like this reverse shit

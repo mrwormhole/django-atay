@@ -48,7 +48,8 @@ class CartAdd(APIView):
 class CartRemove(APIView):
 
     def delete(self, request, format=None):
-        product = Product.objects.get(id = request.data["id"])
+        productID = request.data["productID"]
+        product = Product.objects.get(id = productID)
 
         if request.user.is_authenticated == False:
             return Response({}, status=status.HTTP_200_OK)

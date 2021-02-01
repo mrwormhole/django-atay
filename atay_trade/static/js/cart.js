@@ -29,6 +29,26 @@ $(document).ready(function(){
         }
     });
 
+    function tidyCheckoutArea(data) {
+        $(".order-details-form").empty();
+        $(".order-details-form").append(
+            `<li><span>Product</span> <span>Total</span></li>`
+        );
+        let total = data["total_price"];
+        let productsCount = data["order_items"].length;
+        for(let i = 0; i < productsCount; i++) {
+            let productName = data["order_items"][i]["product"]["name"];
+            let productQuantity = data["order_items"][i]["quantity"];
+            let productPrice = data["order_items"][i]["product"]["price"].toFixed(2);
+            $(".order-details-form").append(`<li><span>${productName} X ${productQuantity}</span> <span>£${productPrice}</span></li>`);
+        }
+        $(".order-details-form").append(
+            `<li><span>Subtotal</span> <span>£${total}</span></li>
+            <li><span>Shipping</span> <span>Free</span></li>
+            <li><span>Total</span> <span>£${total}</span></li>`
+        );
+    }
+
     function populateTheCart() {
         $.ajax({
             type: "GET",
@@ -41,7 +61,6 @@ $(document).ready(function(){
                 $('.summary-total').text("£" + total);
                 $('.count-cart').text(data["items_count"]);
 
-                console.log(data);
                 //let image = data["order_items"][0]["product"]["images"][0]["image"];
 
                 let productsCount = data["order_items"].length;
@@ -78,21 +97,23 @@ $(document).ready(function(){
                             console.log("user is not authenticated");
                         } else {
                             console.log("deleting...");
-                            /*$.ajax({
+                            $.ajax({
                                 type: "DELETE",
                                 url: "http://localhost:8000/cart/remove/",
                                 data: JSON.stringify({"productID": productID}),
                                 contentType: "application/json",
                                 success: function(data) {
                                     console.log(data);
+                                    populateTheCart();
+                                    tidyCheckoutArea(data);
                                 },
                                 error: function(data, err) {
                                     console.log("ERR: ", err);
                                     console.log(data)
                                 }
-                            });*/
+                            });
                         }
-                    });
+                    }, {once: true});
                 }
             },
             error: function(data, err) {
@@ -107,7 +128,6 @@ $(document).ready(function(){
     // get for the cart
     document.getElementsByClassName('get-cart')[0].addEventListener('click', function(e) {
         e.preventDefault();
-        //populate the cart
         populateTheCart();
     });
 
@@ -131,7 +151,7 @@ $(document).ready(function(){
                     contentType: "application/json",
                     success: function(data) {
                         console.log(data);
-                        $( ".cart-list" ).append( "<p>Test</p>" );
+                        populateTheCart();
                     },
                     error: function(data, err) {
                         console.log("ERR: ", err);
