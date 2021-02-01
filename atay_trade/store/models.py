@@ -14,13 +14,23 @@ class Customer(models.Model):
         return self.name
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=50, null=True) # ? there shouldn't be null or blank category
 
     class Meta:
         verbose_name_plural = "Categories"
         
     def __str__(self):
         return self.name
+
+def upload_to(folder_name):
+    now = datetime.now(pytz.utc)
+    return f"{folder_name}/{now:%Y/%m}/"
+
+class CategoryImage(models.Model):
+    # category images size has to be 800x533 (kinda like horizontal wide square)
+    category = models.ForeignKey(Category, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ImageField(upload_to=upload_to("category_images") ,null=True, blank=True)
+    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(800,533)], format="JPEG", options={"quality": 80}) 
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
@@ -31,7 +41,6 @@ class Product(models.Model):
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     stock = models.IntegerField(default=0, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    #TODO: wishlist is designed for db but not added yet
 
     def __str__(self):
         return self.name + " " + str(self.model_number)
@@ -41,9 +50,10 @@ class Product(models.Model):
         sale_percentage = round((self.price - self.discounted_price) / self.price, 2)
         return sale_percentage * 100
 
-def upload_to(folder_name):
-    now = datetime.now(pytz.utc)
-    return f"{folder_name}/{now:%Y/%m}/"
+class Wishlist(models.Model):
+    date_added = models.DateTimeField(auto_now_add=True)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 class ProductImage(models.Model):
     # product images size has to be 1000 x 972 (kinda like horizontal wide square)
@@ -88,7 +98,7 @@ class Order(models.Model):
         return is_available_in_stock, products_that_are_not_available   
 
 class OrderItem(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.SET_NULL, null=True, blank=True) #dont like this reverse shit
+    product = models.OneToOneField(Product, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, related_name="order_items", on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)

@@ -9,6 +9,7 @@ admin.site.register(Customer)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(ShippingAddress)
+admin.site.register(Wishlist)
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -58,4 +59,12 @@ class ProductAdmin(admin.ModelAdmin):
     close_discount.short_description = "Close discount"
 
 admin.site.register(Product, ProductAdmin)  
-admin.site.register(Category)
+
+class CategoryImageInline(admin.TabularInline):
+    model = CategoryImage
+    max_num = 1
+
+class CategoryAdmin(admin.ModelAdmin):
+    inlines = [ CategoryImageInline ] 
+
+admin.site.register(Category, CategoryAdmin)
