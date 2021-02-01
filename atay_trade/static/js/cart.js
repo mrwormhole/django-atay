@@ -67,7 +67,7 @@ $(document).ready(function(){
                 for(let i = 0; i < productsCount; i++) {
                     $(".cart-list").append(
                     `<div class="single-cart-item">
-                        <a href="#" class="product-image">
+                        <a href="/products/${data["order_items"][i]["product"]["id"]}" class="product-image">
                             <img src=${'/static/img/product-img/product-2.jpg'} class="cart-thumb" alt="product cart image">
                         
                             <div class="cart-item-desc">

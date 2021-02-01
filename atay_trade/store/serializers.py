@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
     class Meta:
         model = Product
-        fields = ["id", "category", "name", "price", "model_number", "date_added", "images", "thumbnails"]
+        fields = ["id", "category", "name", "price", "discounted_price", "model_number", "date_added", "stock", "description", "images", "thumbnails"]
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False, read_only = True)

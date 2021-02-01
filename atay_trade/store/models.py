@@ -26,15 +26,20 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=100, null=True)
     price = models.FloatField()
+    discounted_price = models.FloatField(null=True, blank=True)
     model_number = models.CharField(max_length=100, null=True, unique=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     stock = models.IntegerField(default=0, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    #TODO: sale percentage off will be here(how much money discount should it be applied to)
     #TODO: wishlist is designed for db but not added yet
 
     def __str__(self):
         return self.name + " " + str(self.model_number)
+
+    @property
+    def calculate_sale_percantage_number(self):
+        sale_percentage = round((self.price - self.discounted_price) / self.price, 2)
+        return sale_percentage * 100
 
 def upload_to(folder_name):
     now = datetime.now(pytz.utc)
