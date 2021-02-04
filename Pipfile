@@ -10,6 +10,7 @@ django = "*"
 pillow = "*"
 djangorestframework = "*"
 django-imagekit = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

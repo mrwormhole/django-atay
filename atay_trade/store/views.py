@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,10 +8,23 @@ from .serializers import *
 
 
 def store(request):
+    categories = Category.objects.all()
+    categoryImages = {}
+    for i in categories:
+        categoryImages[i.name] = CategoryImage.objects.get(category=i).resized_image.url
+    
     products = Product.objects.all()
-    context = {"products": products}
-    return render(request, "store/index.html", context)
+    productThumbnails = {}
+    for i in products:
+        qs = ProductThumbnail.objects.filter(product = i)
+        if len(qs) < 2:
+            return HttpResponse('<h1>Server Error! There should be at least 2 product thumbnails for a product!</h1>')
+        productThumbnails[i.name] = [0,0]
+        productThumbnails[i.name][0] = qs[0].resized_image.url
+        productThumbnails[i.name][1] = qs[1].resized_image.url
 
+    context = {"categories": categories, "categoryImages": categoryImages, "products": products, "productThumbnails": productThumbnails}
+    return render(request, "store/index.html", context)
 
 class CartList(APIView):
 
@@ -23,7 +36,6 @@ class CartList(APIView):
         serializer = OrderSerializer(order)
         serializer_data = serializer.data
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class CartAdd(APIView):
 
@@ -44,7 +56,6 @@ class CartAdd(APIView):
         serializer_data = serializer.data
         return Response(serializer_data, status=status.HTTP_200_OK)
 
-        
 class CartRemove(APIView):
 
     def delete(self, request, format=None):
@@ -62,7 +73,6 @@ class CartRemove(APIView):
         serializer = OrderSerializer(order)
         serializer_data = serializer.data
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
         
 def checkout(request):
     if request.user.is_authenticated:
@@ -87,6 +97,8 @@ def catalog(request):
 
 def product(request, id):
     product = get_object_or_404(Product, pk=id)
-    productImages = product.images.all()
-    context = {"product": product, "productImages": productImages}
+    qs = product.images.all()
+    if len(qs) < 2:
+        return HttpResponse('<h1>Server Error! There should be at least 2 product images for a product!</h1>')
+    context = {"product": product, "productImages": qs}
     return render(request, "store/product.html", context)

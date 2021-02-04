@@ -61,14 +61,15 @@ $(document).ready(function(){
                 $('.summary-total').text("£" + total);
                 $('.count-cart').text(data["items_count"]);
 
-                //let image = data["order_items"][0]["product"]["images"][0]["image"];
+                let image = data["order_items"][0]["product"];
+                console.log(image);
 
                 let productsCount = data["order_items"].length;
                 for(let i = 0; i < productsCount; i++) {
                     $(".cart-list").append(
                     `<div class="single-cart-item">
                         <a href="/products/${data["order_items"][i]["product"]["id"]}" class="product-image">
-                            <img src=${'/static/img/product-img/product-2.jpg'} class="cart-thumb" alt="product cart image">
+                            <img src=${data["order_items"][i]["product"]["images"][0]["image"]} class="cart-thumb" alt="product cart image">
                         
                             <div class="cart-item-desc">
                             <button data-product="${data["order_items"][i]["product"]["id"]}" data-action="remove" class="product-remove remove-cart" style="background-color: transparent;border: none;"><i class="fa fa-close" aria-hidden="true"></i></button>

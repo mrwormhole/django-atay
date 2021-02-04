@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill, ResizeCanvas
+from imagekit.processors import ResizeToFill, SmartResize
 from datetime import datetime
 import pytz
 
@@ -14,7 +14,7 @@ class Customer(models.Model):
         return self.name
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, null=True) # ? there shouldn't be null or blank category
+    name = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -28,9 +28,9 @@ def upload_to(folder_name):
 
 class CategoryImage(models.Model):
     # category images size has to be 800x533 (kinda like horizontal wide square)
-    category = models.ForeignKey(Category, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
+    category = models.OneToOneField(Category, related_name="image", on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to=upload_to("category_images") ,null=True, blank=True)
-    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(800,533)], format="JPEG", options={"quality": 80}) 
+    resized_image = ImageSpecField(source="image", processors=[ResizeToFill(800,533)], format="JPEG", options={"quality": 80}) 
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
@@ -41,6 +41,7 @@ class Product(models.Model):
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     stock = models.IntegerField(default=0, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    brand = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + str(self.model_number)
@@ -59,13 +60,13 @@ class ProductImage(models.Model):
     # product images size has to be 1000 x 972 (kinda like horizontal wide square)
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to=upload_to("product_images") ,null=True, blank=True)
-    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(1000,972)], format="JPEG", options={"quality": 80}) 
+    resized_image = ImageSpecField(source="image", processors=[SmartResize(1000,972)], format="JPEG", options={"quality": 80}) 
 
 class ProductThumbnail(models.Model):
     # product thumbnails size has to be 1000 x 1364 (kinda like vertical wide rectangle)
     product = models.ForeignKey(Product, related_name="thumbnails", on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to=upload_to("product_thumbnails") , null=True, blank=True)
-    resized_image = ImageSpecField(source="image", processors=[ResizeCanvas(1000,1364)], format="JPEG", options={"quality": 80})
+    resized_image = ImageSpecField(source="image", processors=[ResizeToFill(1000,1364)], format="JPEG", options={"quality": 80})
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
@@ -74,7 +75,10 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, null=True, unique=True)
 
     def __str__(self):
-        return str(self.id)
+        if self.complete is False:
+            return str(self.customer.name + " (NOT COMPLETED)")
+        else: 
+            return str(self.customer.name + " (COMPLETED)")
 
     @property
     def get_cart_total_price(self):
@@ -102,6 +106,12 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="order_items", on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.order.customer is None:
+            return str(str(self.quantity) + " X " + self.product.name + " by AnonymousUser")
+        else:
+            return str(str(self.quantity) + " X " + self.product.name + " by "+(self.order.customer.name))
 
     @property
     def get_total(self):
