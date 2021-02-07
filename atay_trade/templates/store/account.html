@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} - Account {% endblock %}
+
+{% block store %}
+    <div class="content-section">
+      <div class="media">
+        <div class="media-body">
+          <h2 class="account-heading">{{ user.customer.name }}</h2>
+          <p class="text-secondary">{{ user.email }}</p>
+        </div>
+      </div>
+      
+    </div>
+{% endblock store %}

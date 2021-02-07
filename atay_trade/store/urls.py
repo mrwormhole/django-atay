@@ -1,4 +1,5 @@
-from django.urls import path, re_path
+from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = "store"
@@ -11,5 +12,9 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("contact/", views.contact, name="contact"),
     path("catalog/", views.catalog, name="catalog"),
-    path("products/<int:id>", views.product, name="product")
+    path("products/<int:id>", views.product, name="product"),
+    path("signup/", views.signup, name="signup"),
+    path("account/", views.account, name="account"),
+    path('login/', auth_views.LoginView.as_view(template_name='store/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='store/index.html'), name='logout')
 ]

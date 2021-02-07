@@ -76,14 +76,23 @@
                     <button type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
                 </form>
             </div>
-            <!-- Favourite Area -->
+
+            {% if user.is_authenticated %}
+            <!-- Wishlist -->
             <div class="favourite-area">
                 <a href="#"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
             </div>
+            {% endif %}
+
             <!-- User Login Info -->
             <div class="user-login-info">
-                <a href="#"><img src="{% static 'img/core-img/user.svg' %}" alt=""></a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'store:account' %}"><img src="{% static 'img/core-img/user.svg' %}" alt=""></a>
+                {% else %}
+                <a href="{% url 'store:login' %}"><img src="{% static 'img/core-img/user.svg' %}" alt=""></a>
+                {% endif %}
             </div>
+            
             <!-- Cart Area -->
             <div class="cart-area">
                 <a class="get-cart" id="essenceCartBtn"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span class="count-cart"></span></a>

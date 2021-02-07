@@ -1,11 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
+# from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
 from .serializers import *
-
+from .forms import *
 
 def store(request):
     categories = Category.objects.all()
@@ -102,3 +104,20 @@ def product(request, id):
         return HttpResponse('<h1>Server Error! There should be at least 2 product images for a product!</h1>')
     context = {"product": product, "productImages": qs}
     return render(request, "store/product.html", context)
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # username = form.cleaned_data.get('username')
+            # messages.success(request, f'Account created for {username}!')
+            return redirect('store:login')
+    else:
+        form = UserSignUpForm()
+    return render(request, 'store/signup.html', {'form': form})
+
+@login_required
+def account(request):
+    context = {}
+    return render(request, 'store/account.html', context)

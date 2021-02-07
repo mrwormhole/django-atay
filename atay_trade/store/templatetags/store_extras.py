@@ -1,6 +1,6 @@
 from django import template
 register = template.Library()
 
-@register.filter(name="indexOf")
-def indexOf(indexable, i):
+@register.filter(name="index")
+def index(indexable, i):
     return indexable[i]

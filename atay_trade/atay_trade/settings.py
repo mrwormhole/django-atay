@@ -29,8 +29,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+AUTH_USER_MODEL = 'store.CustomUser'
+LOGIN_REDIRECT_URL = 'store:account'
+LOGIN_URL = 'store:login'
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'imagekit',
+    'crispy_forms',
     "store.apps.StoreConfig"
 ]
 
@@ -80,7 +84,7 @@ WSGI_APPLICATION = 'atay_trade.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'atay_trade',
+        'NAME': 'atay_trade_test',
         'USER': 'goldenhand',
         'PASSWORD': 'goldenhand',
         'HOST': '127.0.0.1',
@@ -121,6 +125,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 STATIC_CDN_RESOURCES = os.path.join(os.path.dirname(BASE_DIR), "resources")
 

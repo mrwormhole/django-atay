@@ -23,9 +23,9 @@
                         <!-- Product Image -->
                         <div class="product-img">
                             <a href="{% url 'store:product' id=product.id %}">
-                                <img src='{{productThumbnails|indexOf:product.name|indexOf:0}}' alt="{{product.name}} thumbnail image 1" />
+                                <img src='{{productThumbnails|index:product.name|index:0}}' alt="{{product.name}} thumbnail image 1" />
                                 <!-- Hover Thumb -->
-                                <img class="hover-img" src='{{productThumbnails|indexOf:product.name|indexOf:1}}' alt="{{product.name}} thumbnail image 2" />
+                                <img class="hover-img" src='{{productThumbnails|index:product.name|index:1}}' alt="{{product.name}} thumbnail image 2" />
                             </a>    
                             <!-- Favourite -->
                             <div class="product-favourite">

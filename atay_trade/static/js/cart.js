@@ -61,10 +61,13 @@ $(document).ready(function(){
                 $('.summary-total').text("£" + total);
                 $('.count-cart').text(data["items_count"]);
 
-                let image = data["order_items"][0]["product"];
-                console.log(image);
+                let productsCount;
+                if (data["order_items"] === undefined) {
+                    productsCount = 0 
+                } else {
+                    productsCount = data["order_items"].length;
+                }
 
-                let productsCount = data["order_items"].length;
                 for(let i = 0; i < productsCount; i++) {
                     $(".cart-list").append(
                     `<div class="single-cart-item">
