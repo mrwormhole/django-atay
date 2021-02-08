@@ -30,10 +30,10 @@ class OrderSerializer(serializers.ModelSerializer):
     items_count = serializers.SerializerMethodField()
     class Meta:
         model = Order
-        fields = ["customer", "total_price", "items_count", "date_ordered", "complete", "transaction_id", "order_items"]
+        fields = ["customer", "total_price", "items_count", "date_ordered", "status", "transaction_id", "order_items"]
     
     def get_total_price(self, obj):
-        return obj.get_cart_total_price
+        return obj.get_cart_total_price()
     
     def get_items_count(self, obj):
-        return obj.get_cart_items_count
+        return obj.get_cart_items_count()

@@ -9,7 +9,15 @@ admin.site.unregister(Group)
 
 admin.site.register(CustomUser)
 admin.site.register(Customer)
-admin.site.register(Order)
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+ list_display = ('customer', 'status', 'date_ordered', 'transaction_id',)
+ list_filter = ('status', 'date_ordered',)
+ search_fields = ('customer__user__email', 'customer__full_name','transaction_id',)
+ date_hierarchy = 'date_ordered'
+ ordering = ('status', 'date_ordered',)
+
 admin.site.register(OrderItem)
 admin.site.register(ShippingAddress)
 admin.site.register(Wishlist)
@@ -22,6 +30,7 @@ class ProductThumbnailInline(admin.TabularInline):
     model = ProductThumbnail
     max_num = 2
 
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ ProductThumbnailInline, ProductImageInline ] 
     list_display = ("name", "price", "discounted_price", "model_number", "stock")
@@ -61,13 +70,10 @@ class ProductAdmin(admin.ModelAdmin):
     discount_50.short_description = "Set 50%% discount"
     close_discount.short_description = "Close discount"
 
-admin.site.register(Product, ProductAdmin)  
-
 class CategoryImageInline(admin.TabularInline):
     model = CategoryImage
     max_num = 1
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ CategoryImageInline ] 
-
-admin.site.register(Category, CategoryAdmin)

@@ -47,7 +47,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name + " " + str(self.model_number)
 
-    @property
     def calculate_sale_percantage_number(self):
         sale_percentage = round((self.price - self.discounted_price) / self.price, 2)
         return sale_percentage * 100
@@ -70,28 +69,35 @@ class ProductThumbnail(models.Model):
     resized_image = ImageSpecField(source="image", processors=[ResizeToFill(1000,1364)], format="JPEG", options={"quality": 80})
 
 class Order(models.Model):
+    NOT_PAID_STATUS = 'NP'
+    PAID_STATUS = 'P'
+    DELIVERED_STATUS = 'D'
+
+    STATUS_CHOICES = (
+        (NOT_PAID_STATUS, 'Not paid'),
+        (PAID_STATUS, 'Paid'),
+        (DELIVERED_STATUS, 'Delivered')
+    )
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True, blank=True)
     date_ordered = models.DateTimeField(auto_now_add=True)
-    complete = models.BooleanField(default=False, null=True, blank=False)
     transaction_id = models.CharField(max_length=100, null=True, unique=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=NOT_PAID_STATUS, null=False, blank=False)
 
     def __str__(self):
-        if self.complete is False:
-            return str(self.customer.name + " (NOT COMPLETED)")
-        else: 
-            return str(self.customer.name + " (COMPLETED)")
+        return str(self.customer.user.email + f" (status: {self.status})")
 
-    @property
     def get_cart_total_price(self):
         orderitems = self.order_items.all()
-        return round(sum([item.get_total for item in orderitems]), 2)
+        return round(sum([item.get_total() for item in orderitems]), 2)
     
-    @property
     def get_cart_items_count(self):
         orderitems = self.order_items.all()
         return sum([item.quantity for item in orderitems])
+
+    def get_delivery_price(self):
+        ''' Free delivery over 200 pounds, 5 pounds delivery fee under 200 pounds '''
+        return 0 if self.get_cart_total_price() > 200 else 5
     
-    @property
     def get_availability_from_stock(self):
         is_available_in_stock = True
         products_that_are_not_available = []
@@ -114,7 +120,6 @@ class OrderItem(models.Model):
         else:
             return str(str(self.quantity) + " X " + self.product.name + " by "+(self.order.customer.name))
 
-    @property
     def get_total(self):
         return round(self.product.price * self.quantity, 2)
 

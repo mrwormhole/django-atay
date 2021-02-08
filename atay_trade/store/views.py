@@ -34,7 +34,7 @@ class CartList(APIView):
         if request.user.is_authenticated == False:
             return Response({}, status=status.HTTP_200_OK)
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
         serializer = OrderSerializer(order)
         serializer_data = serializer.data
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -49,7 +49,7 @@ class CartAdd(APIView):
             return Response({}, status=status.HTTP_200_OK)
         
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
         orderItem, created = OrderItem.objects.get_or_create(order = order, product = product)
         orderItem.quantity = orderItem.quantity + 1
         orderItem.save()
@@ -68,7 +68,7 @@ class CartRemove(APIView):
             return Response({}, status=status.HTTP_200_OK)
         
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
         orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
         orderItem.delete()
 
@@ -79,9 +79,9 @@ class CartRemove(APIView):
 def checkout(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        order, created = Order.objects.get_or_create(customer=customer, status=Order.NOT_PAID_STATUS)
         order_items = order.order_items.all()
-        order_total = {'total_price': order.get_cart_total_price, 'items_count': order.get_cart_items_count}
+        order_total = {'total_price': order.get_cart_total_price(), 'items_count': order.get_cart_items_count()}
     else:
         order_items = []
         order_total = {'total_price': 0, 'items_count' : 0}
