@@ -32,9 +32,9 @@ class ProductThumbnailInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ ProductThumbnailInline, ProductImageInline ] 
-    list_display = ("name", "price", "discounted_price", "model_number", "stock")
-    actions = ["discount_10", "discount_20", "discount_30", "discount_40", "discount_50", "close_discount"]
+    inlines = [ ProductThumbnailInline, ProductImageInline, ] 
+    list_display = ("name", "price", "discounted_price", "model_number", "stock",)
+    actions = ["discount_10", "discount_20", "discount_30", "discount_40", "discount_50", "close_discount",]
 
     def discount(self, request, queryset, sale_percentage):
         for product in queryset:
@@ -76,4 +76,4 @@ class CategoryImageInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    inlines = [ CategoryImageInline ] 
+    inlines = [ CategoryImageInline, ] 
