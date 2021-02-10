@@ -116,9 +116,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         if self.order.customer is None:
-            return str(str(self.quantity) + " X " + self.product.name + " by AnonymousUser")
+            return str(str(self.quantity) + "X " + self.product.name + " by AnonymousUser")
         else:
-            return str(str(self.quantity) + " X " + self.product.name + " by " + self.order.customer.full_name)
+            return str(str(self.quantity) + "X " + self.product.name + " by " + self.order.customer.full_name)
 
     def get_total(self):
         return round(self.product.price * self.quantity, 2)

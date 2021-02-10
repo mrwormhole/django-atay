@@ -96,12 +96,13 @@ def contact(request):
     return render(request, "store/contact.html", context)
 
 def catalog(request):
-    real_text = request.GET["q"]
-    text = "gold"
-    vector = SearchVector("name", weight="A") + SearchVector("description", weight="B")
-    query = SearchQuery(text)
-    ''' Full text search on products name and description, and product should be in the stock '''
-    products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.3) & Q(stock__gte=1)).order_by('-rank')
+    text = request.GET.get('q')
+    if text is not None and text != "":
+        vector = SearchVector("name", weight="A") + SearchVector("description", weight="B") + SearchVector("brand", weight="B")
+        query = SearchQuery(text)
+        ''' Full text search on products name and description, and product should be in the stock '''
+        products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.2) & Q(stock__gte=1)).order_by('-rank')
+        # print(products.values_list('name', 'rank'))
     context = {}
     return render(request, "store/catalog.html", context)
 
