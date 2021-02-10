@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
 # from django.contrib import messages
+from django.db.models import Q
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,7 +22,7 @@ def store(request):
     for i in products:
         qs = ProductThumbnail.objects.filter(product = i)
         if len(qs) < 2:
-            return HttpResponse('<h1>Server Error! There should be at least 2 product thumbnails for a product!</h1>')
+            return HttpResponse(f'<h1>Server Error! There should be at least 2 product thumbnails for a product! ({i.name})</h1>')
         productThumbnails[i.name] = [0,0]
         productThumbnails[i.name][0] = qs[0].resized_image.url
         productThumbnails[i.name][1] = qs[1].resized_image.url
@@ -94,6 +96,12 @@ def contact(request):
     return render(request, "store/contact.html", context)
 
 def catalog(request):
+    real_text = request.GET["q"]
+    text = "gold"
+    vector = SearchVector("name", weight="A") + SearchVector("description", weight="B")
+    query = SearchQuery(text)
+    ''' Full text search on products name and description, and product should be in the stock '''
+    products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.3) & Q(stock__gte=1)).order_by('-rank')
     context = {}
     return render(request, "store/catalog.html", context)
 
@@ -101,7 +109,7 @@ def product(request, id):
     product = get_object_or_404(Product, pk=id)
     qs = product.images.all()
     if len(qs) < 2:
-        return HttpResponse('<h1>Server Error! There should be at least 2 product images for a product!</h1>')
+        return HttpResponse(f'<h1>Server Error! There should be at least 2 product images for a product! ({product.name})</h1>')
     context = {"product": product, "productImages": qs}
     return render(request, "store/product.html", context)
 

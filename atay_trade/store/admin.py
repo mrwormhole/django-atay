@@ -6,9 +6,11 @@ admin.site.site_header = "Atay Admin"
 admin.site.site_title = "Atay Admin Area"
 admin.site.index_title = "Welcome to Atay Admin Area"
 admin.site.unregister(Group)
-
 admin.site.register(CustomUser)
-admin.site.register(Customer)
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('user', 'full_name',)
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -33,7 +35,11 @@ class ProductThumbnailInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ ProductThumbnailInline, ProductImageInline, ] 
-    list_display = ("name", "price", "discounted_price", "model_number", "stock",)
+    list_display = ("name", "price", "discounted_price", "brand", "model_number", "stock",)
+    list_filter = ('category__name', 'brand','date_added',)
+    search_fields = ('name', 'brand','model_number',)
+    date_hierarchy = 'date_added'
+    ordering = ('stock', 'date_added',)
     actions = ["discount_10", "discount_20", "discount_30", "discount_40", "discount_50", "close_discount",]
 
     def discount(self, request, queryset, sale_percentage):

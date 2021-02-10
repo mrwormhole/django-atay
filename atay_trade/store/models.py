@@ -9,7 +9,7 @@ import pytz
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
-    full_name = models.CharField(max_length=100, null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True) # TODO we need the name in the user so we can register it via form
 
     def __str__(self):
         return self.user.email
@@ -118,7 +118,7 @@ class OrderItem(models.Model):
         if self.order.customer is None:
             return str(str(self.quantity) + " X " + self.product.name + " by AnonymousUser")
         else:
-            return str(str(self.quantity) + " X " + self.product.name + " by "+(self.order.customer.name))
+            return str(str(self.quantity) + " X " + self.product.name + " by " + self.order.customer.full_name)
 
     def get_total(self):
         return round(self.product.price * self.quantity, 2)
@@ -167,13 +167,11 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):
-    first_name = None
-    last_name = None
     username = None
     email = models.EmailField('email address', unique=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = CustomUserManager()
 
