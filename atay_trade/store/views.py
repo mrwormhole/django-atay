@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
-# from django.contrib import messages
 from django.db.models import Q
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.auth.decorators import login_required
@@ -17,17 +16,19 @@ def store(request):
     for i in categories:
         categoryImages[i.name] = CategoryImage.objects.get(category=i).resized_image.url
     
-    products = Product.objects.all()
+    latest_arrived_products = Product.objects.filter(discounted_price = None).order_by("-date_added")
+    on_sale_products = Product.objects.exclude(discounted_price = None)
+    
     productThumbnails = {}
-    for i in products:
+    for i in latest_arrived_products | on_sale_products:
         qs = ProductThumbnail.objects.filter(product = i)
         if len(qs) < 2:
             return HttpResponse(f'<h1>Server Error! There should be at least 2 product thumbnails for a product! ({i.name})</h1>')
-        productThumbnails[i.name] = [0,0]
-        productThumbnails[i.name][0] = qs[0].resized_image.url
-        productThumbnails[i.name][1] = qs[1].resized_image.url
+        productThumbnails[i.id] = [0,0]
+        productThumbnails[i.id][0] = qs[0].resized_image.url
+        productThumbnails[i.id][1] = qs[1].resized_image.url
 
-    context = {"categories": categories, "categoryImages": categoryImages, "products": products, "productThumbnails": productThumbnails}
+    context = {"categories": categories, "categoryImages": categoryImages, "onSaleProducts": on_sale_products,  "latestArrivedProducts": latest_arrived_products, "productThumbnails": productThumbnails}
     return render(request, "store/index.html", context)
 
 class CartList(APIView):
@@ -96,14 +97,15 @@ def contact(request):
     return render(request, "store/contact.html", context)
 
 def catalog(request):
-    text = request.GET.get('q')
+    text = request.GET.get('search')
+    products = {}
     if text is not None and text != "":
         vector = SearchVector("name", weight="A") + SearchVector("description", weight="B") + SearchVector("brand", weight="B")
         query = SearchQuery(text)
         ''' Full text search on products name and description, and product should be in the stock '''
         products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.2) & Q(stock__gte=1)).order_by('-rank')
-        # print(products.values_list('name', 'rank'))
-    context = {}
+        #print(products.values_list('name', 'rank'))
+    context = {"products": products}
     return render(request, "store/catalog.html", context)
 
 def product(request, id):
@@ -119,8 +121,6 @@ def signup(request):
         form = UserSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            # username = form.cleaned_data.get('username')
-            # messages.success(request, f'Account created for {username}!')
             return redirect('store:login')
     else:
         form = UserSignUpForm()

@@ -46,10 +46,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name + " " + str(self.model_number)
-
+        
     def calculate_sale_percantage_number(self):
+        if self.discounted_price is None:
+            return 0
         sale_percentage = round((self.price - self.discounted_price) / self.price, 2)
-        return sale_percentage * 100
+        return int(sale_percentage * 100)
 
 class Wishlist(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
