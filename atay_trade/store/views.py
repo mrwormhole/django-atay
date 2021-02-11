@@ -16,8 +16,8 @@ def store(request):
     for i in categories:
         categoryImages[i.name] = CategoryImage.objects.get(category=i).resized_image.url
     
-    latest_arrived_products = Product.objects.filter(discounted_price = None).order_by("-date_added")
-    on_sale_products = Product.objects.exclude(discounted_price = None)
+    latest_arrived_products = Product.objects.filter(discounted_price = None).order_by("-date_added")[:8]
+    on_sale_products = Product.objects.exclude(discounted_price = None)[:8]
     
     productThumbnails = {}
     for i in latest_arrived_products | on_sale_products:
@@ -124,9 +124,14 @@ def signup(request):
             return redirect('store:login')
     else:
         form = UserSignUpForm()
-    return render(request, 'store/signup.html', {'form': form})
+    return render(request, "store/signup.html", {'form': form})
 
 @login_required
 def account(request):
     context = {}
-    return render(request, 'store/account.html', context)
+    return render(request, "store/account.html", context)
+
+@login_required
+def wishlist(request):
+    context = {}
+    return render(request, "store/wishlist.html", context)

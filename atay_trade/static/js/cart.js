@@ -58,7 +58,7 @@ $(document).ready(function(){
                 $(".single-cart-item").remove();
 
                 let total = data["total_price"];
-                $('.summary-total').text("£" + total);
+                $('.summary-total').text("£" + total.toFixed(2));
                 $('.count-cart').text(data["items_count"]);
 
                 let productsCount;
@@ -75,7 +75,7 @@ $(document).ready(function(){
                             <img src=${data["order_items"][i]["product"]["images"][0]["image"]} class="cart-thumb" alt="product cart image">
                         
                             <div class="cart-item-desc">
-                            <button data-product="${data["order_items"][i]["product"]["id"]}" data-action="remove" class="product-remove remove-cart" style="background-color: transparent;border: none;"><i class="fa fa-close" aria-hidden="true"></i></button>
+                            <button data-product="${data["order_items"][i]["product"]["id"]}" class="product-remove remove-cart" style="background-color: transparent;border: none;"><i class="fa fa-close" aria-hidden="true"></i></button>
                                 <span class="badge product-quantity">${data["order_items"][i]["quantity"]}X</span>
                                 <h6>${data["order_items"][i]["product"]["name"]}</h6>
                                 <!--<p class="size">Size: S</p>-->

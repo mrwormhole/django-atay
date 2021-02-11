@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'store.CustomUser'
 LOGIN_REDIRECT_URL = 'store:account'
 LOGIN_URL = 'store:login'
+LOGOUT_REDIRECT_URL = 'store:store'
 
 # Application definition
 INSTALLED_APPS = [

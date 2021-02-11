@@ -14,16 +14,37 @@
 
     <!-- Single Product Description -->
     <div class="single_product_desc clearfix">
-        <span>mango</span>
-        <a href="cart.html">
-            <h2>{{ product.name }}</h2>
-        </a>
-        <p class="product-price"><!--<span class="old-price">£{{product.price}}</span>--> £{{product.price}} </p>
+        {% if product.brand %}
+            <span>{{product.brand}}</span>
+        {% endif %}
+
+        <h2>{{ product.name }}</h2>
+
+        
+        {% if product.discounted_price %}
+            <p class="product-price"><span class="old-price">£{{product.price|floatformat:2}}</span> £{{product.discounted_price|floatformat:2}}</p>    
+        {% else %}
+            <p class="product-price"> £{{product.price|floatformat:2}}</p> 
+        {% endif %}
+        
         <p class="product-desc">{{product.description}}</p>
 
-        <!-- Form -->
-        <form class="cart-form clearfix" method="post">
-            <!-- Select Boxes, These will be for the variations of a product
+
+        <div class="cart-fav-box d-flex align-items-center mt-50">
+            <!-- Cart -->
+            <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>
+
+            {% if user.is_authenticated %}
+                <!-- Favourite -->
+                <div class="product-favourite ml-4">
+                    <a href="#" class="favme fa fa-heart"></a>
+                </div>
+            {% endif %}
+        </div>
+
+        
+        <!--<form class="cart-form clearfix" method="post">
+
                 <div class="select-box d-flex mt-50 mb-30">
                     <select name="select" id="productSize" class="mr-5">
                         <option value="value">Size: XL</option>
@@ -38,18 +59,16 @@
                         <option value="value">Color: Purple</option>
                     </select>
                 </div>
-            -->
             
-            <!-- Cart & Favourite Box -->
+        
             <div class="cart-fav-box d-flex align-items-center">
-                <!-- Cart -->
                 <button type="submit" name="addtocart" value="5" class="btn essence-btn">Add to cart</button>
-                <!-- Favourite -->
+
                 <div class="product-favourite ml-4">
                     <a href="#" class="favme fa fa-heart"></a>
                 </div>
             </div>
-        </form>
+        </form>-->
     </div>
 </section>
 <!-- ##### Single Product Details Area End ##### -->
