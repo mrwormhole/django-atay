@@ -128,7 +128,27 @@ def signup(request):
 
 @login_required
 def account(request):
-    context = {}
+    customer = request.user.customer
+    orders = Order.objects.filter(Q(transaction_id__isnull=False) & Q(customer=customer)).order_by("-date_ordered")
+    orders_with_order_items = []
+
+    i = 0
+    for o in orders:
+        order_items = o.order_items.all()
+        orders_with_order_items.append([0, 0])
+        status = 'PAID' if o.status == "P" else 'DELIVERED'
+        total_price = '£' + str(o.get_cart_total_price())
+        orders_with_order_items[i][0] = (i+1, o.date_ordered.date(), o.transaction_id, status, total_price)
+        orders_with_order_items[i][1] = order_items
+        i = i + 1
+
+    should_show = "show"
+    if len(orders) > 5:
+        should_show = ""
+    welcome_with_full_name = f'Welcome back {customer.full_name}!'
+
+    print(orders_with_order_items)
+    context = {"orders_with_order_items": orders_with_order_items, "should_show": should_show, "welcome_with_full_name": welcome_with_full_name}
     return render(request, "store/account.html", context)
 
 @login_required

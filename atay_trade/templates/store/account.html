@@ -1,15 +1,53 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load store_extras %}
 
 {% block title %} - Account {% endblock %}
 
 {% block store %}
-    <div class="content-section">
-      <div class="media">
-        <div class="media-body">
-          <h2 class="account-heading">{{ user.customer.name }}</h2>
-          <p class="text-secondary">{{ user.email }}</p>
-        </div>
+    {% include 'components/breadcrumbArea.html' with title="Account History" uppercase=True %}
+    <div class="content-section mt-5 mb-5">
+      <h3 class="text-center font-weight-normal pt-3">{{welcome_with_full_name}}</h3> 
+      <div class="d-flex justify-content-center align-self-center pt-2 mb-5">
+        <a class="btn essence-btn" style="min-width: 0 !important" href="{% url 'store:checkout' %}"> Checkout </a>
+        <a class="btn essence-btn ml-2" style="min-width: 0 !important" href="{% url 'store:logout' %}"> Logout </a>
+      </div>
+
+      <div class="container pt-3">
+        <table class="table table-borderless table-responsive-sm" style="width: 100% !important;"  id="myTable">
+          <thead class="thead-dark">
+              <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Order Date</th>
+                  <th scope="col">Transaction ID</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Total</th>
+              </tr>
+          </thead>
+          <tbody class="panel">
+              
+                {% for order_with_order_items in orders_with_order_items  %}
+                <tr style="background-color: #FF084E;" data-toggle="collapse" data-target="#demo{{order_with_order_items|index:0|index:0}}" data-parent="#myTable">
+                  <td>{{order_with_order_items|index:0|index:0}}</td>
+                  <td>{{order_with_order_items|index:0|index:1}}</td>
+                  <td>{{order_with_order_items|index:0|index:2}}</td>
+                  <td>{{order_with_order_items|index:0|index:3}}</td>
+                  <td>{{order_with_order_items|index:0|index:4}}</td>
+                </tr>
+                <tr id="demo{{order_with_order_items|index:0|index:0}}" class="collapse {{should_show}} text-primary font-bold" style="background-color: #343A40;">
+                  <td colspan="1">***</td>
+                  <td colspan="3">Products Summary</td>
+                  <td colspan="1">{{order_with_order_items|index:0|index:4}}</td>
+                </tr>
+                {% for order_item in order_with_order_items|index:1 %}
+                <tr id="demo{{order_with_order_items|index:0|index:0}}" class="collapse {{should_show}} text-primary" style="background-color: #f0f0f0;">
+                  <td colspan="1"></td>
+                  <td colspan="4"> <div class="">{{order_item.quantity}}X {{order_item.product.name}}(£{{order_item.product.price}})</div> </td>
+                </tr>
+                {% endfor %}
+              {% endfor %}
+          </tbody>
+        </table>
       </div>
       
     </div>

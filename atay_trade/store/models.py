@@ -81,7 +81,7 @@ class Order(models.Model):
         (DELIVERED_STATUS, 'Delivered')
     )
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True, blank=True)
-    date_ordered = models.DateTimeField(auto_now_add=True)
+    date_ordered = models.DateTimeField(auto_now=True) # updatedAt date
     transaction_id = models.CharField(max_length=100, null=True, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=NOT_PAID_STATUS, null=False, blank=False)
 
@@ -111,7 +111,7 @@ class Order(models.Model):
         return is_available_in_stock, products_that_are_not_available   
 
 class OrderItem(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.PROTECT, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True, blank=True)
     order = models.ForeignKey(Order, related_name="order_items", on_delete=models.PROTECT, null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)

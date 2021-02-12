@@ -4,7 +4,7 @@
 {% block title %} - Checkout {% endblock %}
 
 {% block store %}
-    {% include 'components/breadcrumbArea.html' with title="checkout" %}
+    {% include 'components/breadcrumbArea.html' with title="checkout" uppercase=True %}
     {% include 'components/checkoutArea.html' %}    
 {% endblock store %}
     
