@@ -55,7 +55,7 @@
             {% if user.is_authenticated %}
             <!-- Wishlist -->
             <div class="favourite-area">
-                <a href="#"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
+                <a href="{% url 'store:wishlist' %}"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
             </div>
             {% endif %}
 

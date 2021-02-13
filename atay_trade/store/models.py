@@ -55,7 +55,7 @@ class Product(models.Model):
 
 class Wishlist(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 class ProductImage(models.Model):

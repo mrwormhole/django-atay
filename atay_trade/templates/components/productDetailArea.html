@@ -35,10 +35,20 @@
             <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>
 
             {% if user.is_authenticated %}
+                
+
+                {% if productWishlisted %}
                 <!-- Favourite -->
                 <div class="product-favourite ml-4">
-                    <a href="#" class="favme fa fa-heart"></a>
+                    <a data-product="{{product.id}}" class="favme fa fa-heart active"></a>
                 </div>
+                {% else %}
+                <!-- Favourite -->
+                <div class="product-favourite ml-4">
+                    <a data-product="{{product.id}}" class="favme fa fa-heart"></a>
+                </div>
+                {% endif %}
+
             {% endif %}
         </div>
 

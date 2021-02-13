@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load store_extras %}
+
+{% block title %} - Wishlist {% endblock %}
+
+{% block store %}
+    {% include 'components/breadcrumbArea.html' with title="Wishlist" uppercase=True %}
+    <div class="content-section mt-4 mb-4" style="min-height: 400px;">
+        
+        {% if product|length < 1 %}
+            <div class="d-flex justify-content-center align-self-center pt-3 mb-2 mb-5">
+              <a class="btn essence-btn" style="min-width: 0 !important" href="{% url 'store:catalog' %}"> Catalog </a>
+            </div>
+            <h5 class="text-center font-weight-light">There are no products in your wishlist. Please check out our catalog. </h5> 
+        {% endif %}
+      
+        <div class="container pt-3">
+            <div class="card-deck">
+                
+                {% for product in products %}
+                <div class="card my-3 border-0" style="background-color: #252525;">	
+                    <a class="text-center pt-3 pb-3" href="{% url 'store:product' product.id %}" style="font-weight: 600; font-size: 1.5rem; color: #f0f0f0;">{{product.name}}</a>
+                    <img class="wishlist-product-thumbnail" src="{{productThumbnails|index:product.id}}" class="card-img-top">
+                    <div class="card-body btn-group">
+                        <a class="btn btn-primary mt-auto" href="{% url 'store:product' product.id %}"><i class="far fa-eye fa-2x"></i></a>
+                        <button class="btn btn-primary-like mt-auto" data-product="{{product.id}}"><i class="fas fa-heart fa-2x text-red wishlist-heart"></i></button>
+                    </div>
+                </div>   
+                {% endfor %}
+                    
+                
+                 
+
+                
+            </div>
+            
+        </div>
+    </div>
+{% endblock store %}
