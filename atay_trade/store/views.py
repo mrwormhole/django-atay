@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.http import Http404, HttpResponse, JsonResponse
 from django.db.models import Q
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -141,6 +141,10 @@ def product(request, id):
     return render(request, "store/product.html", context)
 
 def signup(request):
+    if request.user.is_authenticated:
+        print("test")
+        return redirect("store:account")
+
     if request.method == 'POST':
         form = UserSignUpForm(request.POST)
         if form.is_valid():
