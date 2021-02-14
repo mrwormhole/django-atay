@@ -29,7 +29,22 @@ def store(request):
         productThumbnails[i.id][0] = qs[0].resized_image.url
         productThumbnails[i.id][1] = qs[1].resized_image.url
 
-    context = {"categories": categories, "categoryImages": categoryImages, "onSaleProducts": on_sale_products,  "latestArrivedProducts": latest_arrived_products, "productThumbnails": productThumbnails}
+    productWislistStatuses = {}
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        for i in latest_arrived_products | on_sale_products:
+            qs = Wishlist.objects.filter(customer = customer, product = i)
+            if len(qs) == 1:
+                productWislistStatuses[i.id] = True
+            elif len(qs) == 0:
+                productWislistStatuses[i.id] = False   
+
+    context = {"categories": categories, 
+               "categoryImages": categoryImages, 
+               "onSaleProducts": on_sale_products,  
+               "latestArrivedProducts": latest_arrived_products, 
+               "productThumbnails": productThumbnails,
+               "productWishlistStatuses": productWislistStatuses}
     return render(request, "store/index.html", context)
 
 class CartList(APIView):
@@ -185,7 +200,6 @@ def wishlistAdd(request):
             Wishlist.objects.create(customer=customer, product=product)
             print(wishlist)
             return JsonResponse({"status" : "operation succeeded"})
-        print("test")
 
     return JsonResponse({"status" : "API doesn't work that way"})
 
@@ -198,7 +212,6 @@ def wishlistRemove(request):
         wishlist = Wishlist.objects.filter(customer = customer, product= product)
         if len(wishlist) == 1:
             wishlist.delete()
-            print(wishlist)
             return JsonResponse({"status" : "operation succeeded"})
 
     return JsonResponse({"status" : "API doesn't work that way"})

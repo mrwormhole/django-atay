@@ -164,7 +164,7 @@ $(document).ready(function(){
         });
     }
 
-    function addToWishlist(productID, heartIndex) {
+    function addToWishlist(productID, heartIndex = undefined, toggleClassListForButtons = false) {
         $.ajax({
             type: "POST",
             url: "http://localhost:8000/wishlist/add/",
@@ -172,9 +172,13 @@ $(document).ready(function(){
             contentType: "application/json",
             success: function(data) {
                 console.log(data);
-                heartIcons[heartIndex].classList.remove('far');
-                heartIcons[heartIndex].classList.add('fas');
-                heartButtonStates[heartIndex] = 1;
+                if(heartIndex !== undefined && toggleClassListForButtons) {
+                    wishlistHeartIcons[heartIndex].classList.remove('far');
+                    wishlistHeartIcons[heartIndex].classList.add('fas');
+                    wishlistHeartButtonStates[heartIndex] = 1;
+                } else if (heartIndex !== undefined && !toggleClassListForButtons) {
+                    heartFavButtonStates[heartIndex] = 1;
+                }
             },
             error: function(data, err) {
                 console.log("ERR: ", err);
@@ -183,7 +187,7 @@ $(document).ready(function(){
         });
     }
 
-    function removeFromWishlist(productID, heartIndex) {
+    function removeFromWishlist(productID, heartIndex, toggleClassListForButtons = false) {
         $.ajax({
             type: "DELETE",
             url: "http://localhost:8000/wishlist/remove/",
@@ -191,9 +195,13 @@ $(document).ready(function(){
             contentType: "application/json",
             success: function(data) {
                 console.log(data);
-                heartIcons[heartIndex].classList.remove('fas');
-                heartIcons[heartIndex].classList.add('far');
-                heartButtonStates[heartIndex] = 0;
+                if(heartIndex !== undefined && toggleClassListForButtons) {
+                    wishlistHeartIcons[heartIndex].classList.remove('fas');
+                    wishlistHeartIcons[heartIndex].classList.add('far');
+                    wishlistHeartButtonStates[heartIndex] = 0;
+                } else if (heartIndex !== undefined && !toggleClassListForButtons) {
+                    heartFavButtonStates[heartIndex] = 1;
+                }
             },
             error: function(data, err) {
                 console.log("ERR: ", err);
@@ -202,37 +210,43 @@ $(document).ready(function(){
         });
     }
 
-    let heartButtons = document.getElementsByClassName('btn-primary-like');
-    let heartButtonStates = [];
-    let heartIcons = document.getElementsByClassName("wishlist-heart");
-    for(let i = 0; i < heartButtons.length; i++) {
-        heartButtonStates.push(1);
-        heartButtons[i].addEventListener('click', function(e) {
+    // These heart buttons are only inside the wishlist
+    let wishlistHeartButtons = document.getElementsByClassName('btn-primary-like');
+    let wishlistHeartButtonStates = [];
+    let wishlistHeartIcons = document.getElementsByClassName("wishlist-heart");
+    for(let i = 0; i < wishlistHeartButtons.length; i++) {
+        wishlistHeartButtonStates.push(1);
+        wishlistHeartButtons[i].addEventListener('click', function(e) {
             e.preventDefault();
             let productID = this.dataset.product;
 
-            if(heartButtonStates[i] == 1) {
-                removeFromWishlist(productID, i);
-            } else if (heartButtonStates[i] == 0) {
-                addToWishlist(productID, i);
+            if(wishlistHeartButtonStates[i] == 1) {
+                removeFromWishlist(productID, i, true);
+            } else if (wishlistHeartButtonStates[i] == 0) {
+                addToWishlist(productID, i, true);
             }
-
-        
         });
     }
 
+    // These heart buttons are everywhere outside of wishlist
     let heartFavButtons = document.getElementsByClassName('favme');
+    let heartFavButtonStates = [];
     for(let i = 0; i < heartFavButtons.length; i++) {
+        if(heartFavButtons[i].className == "favme fa fa-heart") {
+            heartFavButtonStates.push(0);
+        } else if (heartFavButtons[i].className == "favme fa fa-heart active") {
+            heartFavButtonStates.push(1);
+        }
+
         heartFavButtons[i].addEventListener('click', function(e) {
             e.preventDefault();
             let productID = this.dataset.product;
 
-            if(heartFavButtons[i].className == "favme fa fa-heart active") {
-                console.log("I WAS ACTIVE", productID);
-            } else if (heartFavButtons[i].className == "favme fa fa-heart") {
-                console.log("I WAS INACTIVE", productID);
-            }
-            
+            if(heartFavButtonStates[i] == 1) {
+                removeFromWishlist(productID, i);
+            } else if (heartFavButtonStates[i] == 0) {
+                addToWishlist(productID, i);
+            } 
         })
     }
 

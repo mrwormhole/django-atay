@@ -31,7 +31,11 @@
                             {% if user.is_authenticated %}
                             <!-- Favourite -->
                             <div class="product-favourite">
-                                <a href="#" class="favme fa fa-heart"></a>
+                                {% if productWishlistStatuses|index:product.id %}
+                                <a data-product="{{product.id}}" class="favme fa fa-heart active"></a>
+                                {% else %}
+                                <a data-product="{{product.id}}" class="favme fa fa-heart"></a>
+                                {% endif %}
                             </div>
                             {% endif %}
                             
