@@ -1,4 +1,5 @@
 {% load static %}
+{% load store_extras %}
 <!-- ##### Shop Grid Area Start ##### -->
 <section class="shop_grid_area section-padding-80">
     <div class="container">
@@ -9,13 +10,21 @@
                     <!-- ##### Single Widget ##### -->
                     <div class="widget catagory mb-50">
                         <!-- Widget Title -->
-                        <h6 class="widget-title mb-30">Catagories</h6>
+                        <h6 class="widget-title mb-15">Catagories</h6>
 
                         <!--  Catagories  -->
                         <div class="catagories-menu">
                             <ul id="menu-content2" class="menu-content collapse show">
+                                <ul class="sub-menu">
+                                    <li><a href="{% url 'store:catalog' %}">All</a></li>
+
+                                    {% for category in categories  %}
+                                        <li><a href="{% url 'store:catalogByCategory' category.name|lower %}">{{category.name}}</a></li>
+                                    {% endfor %}
+                                        
+                                </ul>
                                 <!-- Single Item -->
-                                <li data-toggle="collapse" data-target="#clothing">
+                                <!--<li data-toggle="collapse" data-target="#clothing">
                                     <a href="#">clothing</a>
                                     <ul class="sub-menu collapse show" id="clothing">
                                         <li><a href="#">All</a></li>
@@ -30,9 +39,9 @@
                                         <li><a href="#">Shirts</a></li>
                                         <li><a href="#">Sweaters &amp; Knits</a></li>
                                     </ul>
-                                </li>
+                                </li>-->
                                 <!-- Single Item -->
-                                <li data-toggle="collapse" data-target="#shoes" class="collapsed">
+                                <!--<li data-toggle="collapse" data-target="#shoes" class="collapsed">
                                     <a href="#">shoes</a>
                                     <ul class="sub-menu collapse" id="shoes">
                                         <li><a href="#">All</a></li>
@@ -47,24 +56,7 @@
                                         <li><a href="#">Shirts</a></li>
                                         <li><a href="#">Sweaters &amp; Knits</a></li>
                                     </ul>
-                                </li>
-                                <!-- Single Item -->
-                                <li data-toggle="collapse" data-target="#accessories" class="collapsed">
-                                    <a href="#">accessories</a>
-                                    <ul class="sub-menu collapse" id="accessories">
-                                        <li><a href="#">All</a></li>
-                                        <li><a href="#">Bodysuits</a></li>
-                                        <li><a href="#">Dresses</a></li>
-                                        <li><a href="#">Hoodies &amp; Sweats</a></li>
-                                        <li><a href="#">Jackets &amp; Coats</a></li>
-                                        <li><a href="#">Jeans</a></li>
-                                        <li><a href="#">Pants &amp; Leggings</a></li>
-                                        <li><a href="#">Rompers &amp; Jumpsuits</a></li>
-                                        <li><a href="#">Shirts &amp; Blouses</a></li>
-                                        <li><a href="#">Shirts</a></li>
-                                        <li><a href="#">Sweaters &amp; Knits</a></li>
-                                    </ul>
-                                </li>
+                                </li>-->
                             </ul>
                         </div>
                     </div>
@@ -72,20 +64,38 @@
                     <!-- ##### Single Widget ##### -->
                     <div class="widget price mb-50">
                         <!-- Widget Title -->
-                        <h6 class="widget-title mb-30">Filter by</h6>
+                        <h6 class="widget-title mb-15">Filter by</h6>
                         <!-- Widget Title 2 -->
                         <p class="widget-title2 mb-30">Price</p>
 
                         <div class="widget-desc">
                             <div class="slider-range">
-                                <div data-min="49" data-max="360" data-unit="$" class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-value-min="49" data-value-max="360" data-label-result="Range:">
+                                <div data-min="1" data-max="1000" data-unit="£" class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-value-min="1" data-value-max="1000" data-label-result="Range:">
                                     <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
                                     <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
                                     <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
                                 </div>
-                                <div class="range-price">Range: $49.00 - $360.00</div>
+                                
+                                {% if minPrice and maxPrice %}
+                                <div class="range-price">Range: £{{minPrice|floatformat:0}} - £{{maxPrice|floatformat:0}}</div>
+                                {% else %}
+                                <div class="range-price">Range: £1.00 - £1000.00</div>
+                                {% endif %}
                             </div>
                         </div>
+                        
+                        {% if categoryName is not None %}
+                            <form class="price-filterer-form" action="{% url 'store:catalogByCategory' categoryName %}" method="get">
+                                <input class="d-none priceRange" name="priceRange" >
+                                <button type="submit" class="btn essence-btn mt-4 mb-4"> FILTER </button>
+                            </form>
+                        {% else %}
+                            <form class="price-filterer-form" action="{% url 'store:catalog' %}" method="get">
+                                <input class="d-none priceRange" name="priceRange" >
+                                <button type="submit" class="btn essence-btn mt-4 mb-4"> FILTER </button>
+                            </form>
+                        {% endif %}                        
+                        
                     </div>
 
                     <!-- ##### Single Widget ##### -->
@@ -106,11 +116,10 @@
                                 <li><a href="#" class="color10"></a></li>
                             </ul>
                         </div>
-                    </div>-->
+                    </div>
 
-                    <!-- ##### Single Widget ##### -->
+                    ##### Single Widget #####
                     <div class="widget brands mb-50">
-                        <!-- Widget Title 2 -->
                         <p class="widget-title2 mb-30">Brands</p>
                         <div class="widget-desc">
                             <ul>
@@ -121,7 +130,7 @@
                                 <li><a href="#">Zara</a></li>
                             </ul>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -132,366 +141,183 @@
                             <div class="product-topbar d-flex align-items-center justify-content-between">
                                 <!-- Total Products -->
                                 <div class="total-products">
-                                    <p><span>186</span> products found</p>
+                                    {% if products.paginator.count is None %}
+                                        <p><span>0</span> products found</p>
+                                    {% elif products.paginator.count == 1 %}
+                                        <p><span>{{products.paginator.count}}</span> product found</p>
+                                    {% else %}
+                                        <p><span>{{products.paginator.count}}</span> products found</p>
+                                    {% endif %}
                                 </div>
                                 <!-- Sorting -->
                                 <div class="product-sorting d-flex">
                                     <p>Sort by:</p>
-                                    <form action="#" method="get">
-                                        <select name="select" id="sortByselect">
-                                            <option value="value">Highest Rated</option>
-                                            <option value="value">Newest</option>
-                                            <option value="value">Price: $$ - $</option>
-                                            <option value="value">Price: $ - $$</option>
+                                    
+                                    {% if categoryName is not None %}
+                                    <form action="{% url 'store:catalogByCategory' categoryName %}" method="get">
+                                        <select name="sortBy" id="sortByselect" onchange="if(this.value != undefined) { this.form.submit(); }">
+                                            
+                                            {% if sortBy == "sale" %}
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% elif sortBy == "toLowerPrice" %}
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% elif sortBy == "toHigherPrice" %}
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            {% else %}
+                                            <option value="new">Newest</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% endif %}
+                                                
                                         </select>
                                         <input type="submit" class="d-none" value="">
                                     </form>
+                                    {% else %}
+                                    <form action="{% url 'store:catalog' %}" method="get">
+                                        <select name="sortBy" id="sortByselect" onchange="if(this.value != undefined) { this.form.submit(); }">
+                                            
+                                            {% if sortBy == "sale" %}
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% elif sortBy == "toLowerPrice" %}
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% elif sortBy == "toHigherPrice" %}
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="new">Newest</option>
+                                            {% else %}
+                                            <option value="new">Newest</option>
+                                            <option value="sale">Sale</option>
+                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            {% endif %}
+                                                
+                                        </select>
+                                        <input type="submit" class="d-none" value="">
+                                    </form>
+                                    {% endif %}
+                                        
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
+                        {% for product in products %}
+                            <!-- Single Product SALE EXAMPLE -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="single-product-wrapper">
+                                    <!-- Product Image -->
+                                    <div class="product-img">
+                                        <a href="{% url 'store:product' id=product.id %}">
+                                            <img src="{{productThumbnails|index:product.id|index:0}}" alt="">
+                                            <!-- Hover Thumb -->
+                                            <img class="hover-img" src="{{productThumbnails|index:product.id|index:1}}" alt="">
+                                        </a>
 
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-1.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-2.jpg' %}" alt="">
+                                        {% if product.discounted_price %}
+                                        <div class="product-badge offer-badge">
+                                            <span>-{{product.calculate_sale_percantage_number }}%</span>
+                                        </div>    
+                                        {% endif %}
 
-                                    <!-- Product Badge -->
-                                    <div class="product-badge offer-badge">
-                                        <span>-30%</span>
+                                        
+                                        {% if product.is_new and product.discounted_price is None %}
+                                        <div class="product-badge new-badge">
+                                            <span>New</span>
+                                        </div>
+                                        {% endif %}
+                                            
+                                            
+                                        {% if user.is_authenticated %}
+                
+                                            {% if productWishlistStatuses|index:product.id %}
+                                            <!-- Favourite -->
+                                            <div class="product-favourite ml-4">
+                                                <a data-product="{{product.id}}" class="favme fa fa-heart active"></a>
+                                            </div>
+                                            {% else %}
+                                            <!-- Favourite -->
+                                            <div class="product-favourite ml-4">
+                                                <a data-product="{{product.id}}" class="favme fa fa-heart"></a>
+                                            </div>
+                                            {% endif %}
+
+                                        {% endif %}
                                     </div>
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
 
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price"><span class="old-price">$75.00</span> $55.00</p>
+                                    <!-- Product Description -->
+                                    <div class="product-description">
+                                        {% if product.brand %}
+                                            <span>{{product.brand}}</span>
+                                        {% endif %}
+                                        <a href="{% url 'store:product' id=product.id %}">
+                                            <h6>{{product.name}}</h6>
+                                        </a>
 
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
+                                        {% if product.discounted_price %}
+                                        <p class="product-price"><span class="old-price">£{{product.price|floatformat:2}}</span> £{{product.discounted_price|floatformat:2}}</p>    
+                                        {% else %}
+                                        <p class="product-price"> £{{product.price|floatformat:2}}</p> 
+                                        {% endif %}
+
+                                        <!-- Hover Content -->
+                                        <div class="hover-content">
+                                            <!-- Add to Cart -->
+                                            <div class="add-to-cart-btn">
+                                                <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-2.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-3.jpg' %}" alt="">
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-3.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-4.jpg' %}" alt="">
-
-                                    <!-- Product Badge -->
-                                    <div class="product-badge new-badge">
-                                        <span>New</span>
-                                    </div>
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-4.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-5.jpg' %}" alt="">
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-5.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-6.jpg' %}" alt="">
-
-                                    <!-- Product Badge -->
-                                    <div class="product-badge offer-badge">
-                                        <span>-30%</span>
-                                    </div>
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price"><span class="old-price">$75.00</span> $55.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-6.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-7.jpg' %}" alt="">
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-7.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-8.jpg' %}" alt="">
-
-                                    <!-- Product Badge -->
-                                    <div class="product-badge new-badge">
-                                        <span>New</span>
-                                    </div>
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-8.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-9.jpg' %}" alt="">
-                                    
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Single Product -->
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="single-product-wrapper">
-                                <!-- Product Image -->
-                                <div class="product-img">
-                                    <img src="{% static 'img/product-img/product-9.jpg' %}" alt="">
-                                    <!-- Hover Thumb -->
-                                    <img class="hover-img" src="{% static 'img/product-img/product-10.jpg' %}" alt="">
-
-                                    <!-- Favourite -->
-                                    <div class="product-favourite">
-                                        <a href="#" class="favme fa fa-heart"></a>
-                                    </div>
-                                </div>
-
-                                <!-- Product Description -->
-                                <div class="product-description">
-                                    <span>topshop</span>
-                                    <a href="single-product-details.html">
-                                        <h6>Knot Front Mini Dress</h6>
-                                    </a>
-                                    <p class="product-price">$80.00</p>
-
-                                    <!-- Hover Content -->
-                                    <div class="hover-content">
-                                        <!-- Add to Cart -->
-                                        <div class="add-to-cart-btn">
-                                            <a href="#" class="btn essence-btn">Add to Cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                        {% endfor %}
                     </div>
                 </div>
+
+
                 <!-- Pagination -->
                 <nav aria-label="navigation">
-                    <ul class="pagination mt-50 mb-70">
-                        <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-left"></i></a></li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">21</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-right"></i></a></li>
+                    <ul class="pagination mt-20 mb-40">
+                        {% if products.has_previous %}
+                            <li class="page-item" style="margin-right: 15px;"><a class="page-link" href="?page={{products.previous_page_number}}&sortBy={{sortBy}}"><i class="fa fa-angle-left"></i></a></li>    
+                        {% endif %}
+
+                        {% for pageNumber in products.paginator.page_range %}
+                            
+                            {% if products.paginator.count != 0 %}
+                                {% if products.number == pageNumber  %}
+                                    <li class="page-item"><a class="page-link page-link-active">{{pageNumber}}</a></li>
+                                {% elif pageNumber > products.number|add:'-3' and pageNumber < products.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{pageNumber}}&sortBy={{sortBy}}">{{pageNumber}}</a></li>
+                                {% endif %}    
+                            {% endif %}
+                                
+                        {% endfor %}
+                        
+                        {% if products.has_next %}
+                            <li class="page-item" style="margin-left: 15px;"><a class="page-link" href="?page={{products.next_page_number}}&sortBy={{sortBy}}"><i class="fa fa-angle-right"></i></a></li>
+                        {% endif %}
                     </ul>
                 </nav>
+
             </div>
         </div>
     </div>

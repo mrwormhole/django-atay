@@ -10,7 +10,7 @@
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="single_catagory_area d-flex align-items-center justify-content-center bg-img" style="background-image: url({{categoryImages|index:category.name}})">
                         <div class="catagory-content">
-                            <a href="{% url 'store:catalog' %}">{{category.name}}</a>
+                            <a href="{% url 'store:catalogByCategory' category.name|lower %}">{{category.name}}</a>
                         </div>
                     </div>
                 </div> 
@@ -18,7 +18,7 @@
                 <div class="col-12 col-sm-6 col-md-4 mt-md-4">
                     <div class="single_catagory_area d-flex align-items-center justify-content-center bg-img" style="background-image: url({{categoryImages|index:category.name}})">
                         <div class="catagory-content">
-                            <a href="{% url 'store:catalog' %}">{{category.name}}</a>
+                            <a href="{% url 'store:catalogByCategory' category.name|lower %}">{{category.name}}</a>
                         </div>
                     </div>
                 </div> 

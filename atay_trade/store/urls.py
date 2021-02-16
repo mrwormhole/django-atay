@@ -12,6 +12,7 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("contact/", views.contact, name="contact"),
     path("catalog/", views.catalog, name="catalog"),
+    path("catalog/<str:category>", views.catalog, name="catalogByCategory"),
     path("products/<int:id>", views.product, name="product"),
     path("signup/", views.signup, name="signup"),
     path("account/", views.account, name="account"),

@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill, SmartResize
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 
 class Customer(models.Model):
@@ -52,6 +52,14 @@ class Product(models.Model):
             return 0
         sale_percentage = round((self.price - self.discounted_price) / self.price, 2)
         return int(sale_percentage * 100)
+
+    def is_new(self):
+        product_date = self.date_added.date()
+        today_date = datetime.now().date()
+        diff = today_date - product_date
+        if diff.days < 30:
+            return True
+        return False
 
 class Wishlist(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)

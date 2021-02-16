@@ -22,12 +22,12 @@
                         <li><a href="" class="text-dark font-italic">Shop</a>
                             <div class="megamenu">
                                 <ul class="single-mega cn-col-4">
-                                    <li class="title font-bold">Categories</li>             
-                                    <li><a href="{% url 'store:catalog' %}">Bracelets</a></li>
-                                    <li><a href="{% url 'store:catalog' %}">Earrings</a></li>
-                                    <li><a href="{% url 'store:catalog' %}">Necklaces</a></li>
-                                    <li><a href="{% url 'store:catalog' %}">Hats</a></li>
-                                    <li><a href="{% url 'store:catalog' %}">Socks</a></li>
+                                    <li class="title font-bold">Categories</li>           
+                                    <li><a href="{% url 'store:catalogByCategory' 'bracelets' %}">Bracelets</a></li>
+                                    <li><a href="{% url 'store:catalogByCategory' 'earrings' %}">Earrings</a></li>
+                                    <li><a href="{% url 'store:catalogByCategory' 'necklaces' %}">Necklaces</a></li>
+                                    <li><a href="{% url 'store:catalogByCategory' 'hats' %}">Hats</a></li>
+                                    <li><a href="{% url 'store:catalogByCategory' 'socks' %}">Socks</a></li>
                                 </ul>
                                 <ul class="single-mega cn-col-4">
                                     <img src="{% static 'img/bg-img/bg-6.jpg' %}" alt="">

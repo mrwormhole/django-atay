@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.http import Http404, HttpResponse, JsonResponse
 from django.db.models import Q
@@ -112,16 +113,76 @@ def contact(request):
     context = {}
     return render(request, "store/contact.html", context)
 
-def catalog(request):
-    text = request.GET.get('search')
-    products = {}
+def catalog(request, category = None):
+    page = request.GET.get("page")
+    text = request.GET.get("search")
+    sortBy = request.GET.get("sortBy")
+    priceRange = request.GET.get("priceRange")
+    maxPrice = 0
+    minPrice = 0  
+
+    categories = Category.objects.all()
+    products = []
     if text is not None and text != "":
         vector = SearchVector("name", weight="A") + SearchVector("description", weight="B") + SearchVector("brand", weight="B")
         query = SearchQuery(text)
         ''' Full text search on products name and description, and product should be in the stock '''
         products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.2) & Q(stock__gte=1)).order_by('-rank')
         #print(products.values_list('name', 'rank'))
-    context = {"products": products}
+    else:
+        if sortBy == "sale":
+            products = Product.objects.exclude(Q(discounted_price=None) & ~Q(stock=0)).order_by("-discounted_price")
+        elif sortBy == "toLowerPrice":
+            products = Product.objects.filter(Q(stock__gte = 1)).order_by("-price")
+        elif sortBy == "toHigherPrice":
+            products = Product.objects.filter(Q(stock__gte = 1)).order_by("price")
+        else:
+            products = Product.objects.filter(Q(stock__gte = 1)).order_by("-date_added")
+
+
+    if priceRange is not None:
+        prices = priceRange.split("-")
+        minPrice = float(prices[0])
+        maxPrice = float(prices[1])
+        products = Product.objects.filter(Q(stock__gte = 1) & Q(price__gte = minPrice) & Q(price__lte=maxPrice)).order_by("price")
+        sortBy = "toLowerPrice"
+
+    productThumbnails = {}
+    for p in products:
+        qs = ProductThumbnail.objects.filter(product = p)
+        if len(qs) < 2:
+            return HttpResponse(f'<h1>Server Error! There should be at least 2 product thumbnails for a product! ({p.name})</h1>')
+        productThumbnails[p.id] = [0,0]
+        productThumbnails[p.id][0] = qs[0].resized_image.url
+        productThumbnails[p.id][1] = qs[1].resized_image.url
+
+    productWislistStatuses = {}
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        for p in products:
+            qs = Wishlist.objects.filter(customer = customer, product = p)
+            if len(qs) == 1:
+                productWislistStatuses[p.id] = True
+            elif len(qs) == 0:
+                productWislistStatuses[p.id] = False 
+
+    categoryName = None
+    if category is not None and category != "":
+        categoryName = category
+        products = products.filter(Q(category__name__icontains = category))
+
+    paginator = Paginator(products, 6)
+    products = paginator.get_page(page)
+    #print(products.object_list)
+    
+    context = {"categories": categories,
+               "products": products, 
+               "productThumbnails": productThumbnails, 
+               "productWishlistStatuses": productWislistStatuses, 
+               "sortBy": sortBy, 
+               "minPrice": minPrice,
+               "maxPrice": maxPrice,
+               "categoryName": categoryName}
     return render(request, "store/catalog.html", context)
 
 def product(request, id):

@@ -890,14 +890,10 @@ img {
     .pagination .page-item .page-link:hover, .pagination .page-item .page-link:focus {
       color: #0315ff;
       box-shadow: none; }
-  .pagination .page-item:first-child {
-    margin-right: 15px; }
     .pagination .page-item:first-child .page-link {
       margin-left: 0;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }
-  .pagination .page-item:last-child {
-    margin-left: 15px; }
     .pagination .page-item:last-child .page-link {
       margin-left: 0;
       border-top-right-radius: 0;
@@ -1828,6 +1824,11 @@ img {
   .card-deck .card {
     flex: 0 0 calc(33.3333333333% - 30px);
   }
+}
+
+.page-link-active {
+  background-color: #e9ecef !important;
+  color: #0315ff !important;
 }
 
 /* ##### The End ##### */

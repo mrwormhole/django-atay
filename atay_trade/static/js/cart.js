@@ -57,8 +57,10 @@ $(document).ready(function(){
             success: function(data) {
                 $(".single-cart-item").remove();
 
-                let total = data["total_price"];
-                $('.summary-total').text("£" + total.toFixed(2));
+                if (data["total_price"] !== undefined) {
+                    $('.summary-total').text("£" + data["total_price"].toFixed(2));
+                }
+                
                 $('.count-cart').text(data["items_count"]);
 
                 let productsCount;
@@ -249,5 +251,14 @@ $(document).ready(function(){
             } 
         })
     }
+
+    document.getElementsByClassName('price-filterer-form')[0].addEventListener('submit', function(e) {
+        let rangePriceText =  document.getElementsByClassName('range-price')[0].textContent;
+        rangePriceText = rangePriceText.slice(7).split("-");
+        rangePriceText[0] = rangePriceText[0].trim().slice(1);
+        rangePriceText[1] = rangePriceText[1].trim().slice(1);
+        rangePriceText = rangePriceText.join("-");
+        $(".priceRange").val(rangePriceText);
+    });
 
 });
