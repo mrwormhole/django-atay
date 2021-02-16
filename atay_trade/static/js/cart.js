@@ -15,6 +15,12 @@ $(document).ready(function(){
         return cookieValue;
     }
     var csrftoken = getCookie('csrftoken');
+    var guestCart = JSON.parse(getCookie('cart'));
+    if (guestCart == undefined) {
+        guestCart = {};
+        document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+    } 
+    console.log("GUEST CART:", guestCart)
 
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
@@ -56,12 +62,17 @@ $(document).ready(function(){
             contentType: "application/json",
             success: function(data) {
                 $(".single-cart-item").remove();
+                $('.subtotal').text("£" + data["total_price"].toFixed(2))
+                $('.count-cart').text(data["items_count"]);
 
                 if (data["total_price"] !== undefined) {
                     $('.summary-total').text("£" + data["total_price"].toFixed(2));
                 }
-                
-                $('.count-cart').text(data["items_count"]);
+                if (data["delivery_price"] != 0) {
+                    $('.delivery').text("£" + data["delivery_price"].toFixed(2));   
+                    let allTotal = (data["total_price"] + data["delivery_price"]).toFixed(2)
+                    $('.summary-total').text("£" + allTotal);
+                }
 
                 let productsCount;
                 if (data["order_items"] === undefined) {
@@ -71,6 +82,10 @@ $(document).ready(function(){
                 }
 
                 for(let i = 0; i < productsCount; i++) {
+                    let price = data["order_items"][i]["product"]["price"].toFixed(2);
+                    if (data["order_items"][i]["product"]["discounted_price"] != null) {
+                        price = data["order_items"][i]["product"]["discounted_price"].toFixed(2)
+                    }
                     $(".cart-list").append(
                     `<div class="single-cart-item">
                         <a href="/products/${data["order_items"][i]["product"]["id"]}" class="product-image">
@@ -82,7 +97,7 @@ $(document).ready(function(){
                                 <h6>${data["order_items"][i]["product"]["name"]}</h6>
                                 <!--<p class="size">Size: S</p>-->
                                 <!--<p class="color">Color: Red</p>-->
-                                <p class="price">£${data["order_items"][i]["product"]["price"].toFixed(2)}</p>
+                                <p class="price">£${price}</p>
                             </div>
                         </a>
                     </div>`);
@@ -100,6 +115,11 @@ $(document).ready(function(){
                         console.log("user:", user);
                         if (user == "AnonymousUser") {
                             console.log("user is not authenticated");
+                            if (guestCart[productID] != undefined) {
+                                delete guestCart[productID];
+                                document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+                                console.log("GUEST CART", guestCart);
+                            }
                         } else {
                             console.log("deleting...");
                             $.ajax({
@@ -147,6 +167,14 @@ $(document).ready(function(){
             console.log("user:", user);
             if (user == "AnonymousUser") {
                 console.log("user is not authenticated");
+                if (guestCart[productID] == undefined) {
+                    guestCart[productID] = {'quantity': 1};
+                } else {
+                    guestCart[productID]['quantity'] += 1;
+                }
+                console.log("GUEST CART", guestCart);
+                document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+                populateTheCart();
             } else {
                 $.ajax({
                     type: "POST",
@@ -252,13 +280,17 @@ $(document).ready(function(){
         })
     }
 
-    document.getElementsByClassName('price-filterer-form')[0].addEventListener('submit', function(e) {
-        let rangePriceText =  document.getElementsByClassName('range-price')[0].textContent;
-        rangePriceText = rangePriceText.slice(7).split("-");
-        rangePriceText[0] = rangePriceText[0].trim().slice(1);
-        rangePriceText[1] = rangePriceText[1].trim().slice(1);
-        rangePriceText = rangePriceText.join("-");
-        $(".priceRange").val(rangePriceText);
-    });
+    let priceFiltererForm = document.getElementsByClassName("price-filterer-form")[0]
+    if (priceFiltererForm != undefined) {
+        document.getElementsByClassName('price-filterer-form')[0].addEventListener('submit', function(e) {
+            let rangePriceText =  document.getElementsByClassName('range-price')[0].textContent;
+            rangePriceText = rangePriceText.slice(7).split("-");
+            rangePriceText[0] = rangePriceText[0].trim().slice(1);
+            rangePriceText[1] = rangePriceText[1].trim().slice(1);
+            rangePriceText = rangePriceText.join("-");
+            $(".priceRange").val(rangePriceText);
+        });
+    }
+    
 
 });

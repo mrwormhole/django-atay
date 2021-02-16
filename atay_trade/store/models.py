@@ -104,9 +104,11 @@ class Order(models.Model):
         orderitems = self.order_items.all()
         return sum([item.quantity for item in orderitems])
 
-    def get_delivery_price(self):
-        ''' Free delivery over 200 pounds, 5 pounds delivery fee under 200 pounds '''
-        return 0 if self.get_cart_total_price() > 200 else 5
+    @staticmethod
+    def get_delivery_price(total_price):
+        if total_price > 200 or total_price == 0:
+            return 0
+        return 5
     
     def get_availability_from_stock(self):
         is_available_in_stock = True
@@ -131,7 +133,9 @@ class OrderItem(models.Model):
             return str(str(self.quantity) + "X " + self.product.name + " by " + self.order.customer.full_name)
 
     def get_total(self):
-        return round(self.product.price * self.quantity, 2)
+        if self.product.discounted_price is None:
+            return round(self.product.price * self.quantity, 2)
+        return round(self.product.discounted_price * self.quantity, 2)
 
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True, blank=True)

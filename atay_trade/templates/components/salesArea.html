@@ -63,7 +63,11 @@
                             <div class="hover-content">
                                 <!-- Add to Cart -->
                                 <div class="add-to-cart-btn">
-                                    <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>
+                                    {% if product.stock == 0 %}
+                                        <button disabled data-product="{{product.id}}" class="btn essence-btn add-cart">Out of stock</button>
+                                    {% else %}
+                                        <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>    
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

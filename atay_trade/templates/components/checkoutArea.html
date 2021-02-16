@@ -88,11 +88,22 @@
                     <ul class="order-details-form mb-4">
                         <li><span>Product</span> <span>Total</span></li>                       
                         {% for i in items %}
-                        <li><span>{{i.product.name}} X {{i.quantity}}</span> <span>£{{i.product.price}}</span></li>
+                            
+                            {% if i.product.discounted_price is None %}
+                            <li><span>{{i.product.name}} X {{i.quantity}}</span> <span>£{{i.product.price}}</span></li>
+                            {% else %}
+                            <li><span>{{i.product.name}} X {{i.quantity}}</span> <span>£{{i.product.discounted_price}}</span></li>        
+                            {% endif %}
                         {% endfor %}
                             
-                        <li><span>Subtotal</span> <span>£{{total.total_price}}</span></li>
-                        <li><span>Shipping</span> <span>Free</span></li>
+                        <li><span>Subtotal</span> <span>£{{total.subtotal}}</span></li>
+                        
+                        {% if total.delivery_price == 0 %}
+                            <li><span>Shipping</span> <span>Free</span></li>
+                        {% else %}
+                            <li><span>Shipping</span> <span>£{{total.delivery_price}}</span></li>
+                        {% endif %}
+
                         <li><span>Total</span> <span>£{{total.total_price}}</span></li>
                     </ul>
 

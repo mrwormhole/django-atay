@@ -19,6 +19,10 @@
         {% endif %}
 
         <h2>{{ product.name }}</h2>
+        
+        {% if product.stock != 0 %}
+            <p style="color: red;"> The product is not in our inventory yet.</p>
+        {% endif %}
 
         
         {% if product.discounted_price %}
@@ -32,11 +36,14 @@
 
         <div class="cart-fav-box d-flex align-items-center mt-50">
             <!-- Cart -->
-            <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>
+            {% if product.stock != 0 %}
+                <button disabled data-product="{{product.id}}" class="btn essence-btn add-cart">Out of stock</button>
+            {% else %}
+                <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>    
+            {% endif %}
 
             {% if user.is_authenticated %}
                 
-
                 {% if productWishlisted %}
                 <!-- Favourite -->
                 <div class="product-favourite ml-4">
