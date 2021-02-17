@@ -9,10 +9,14 @@ import pytz
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
-    full_name = models.CharField(max_length=100, null=True, blank=True) # TODO we need the name in the user so we can register it via form
+    full_name = models.CharField(max_length=100, null=True, blank=True) # we need the full name here so we can register it via user form
+    guest_email = models.EmailField(null=True, blank=True) # we need an email here so that we can keep guest's emails for future analysis of people
 
     def __str__(self):
-        return self.user.email
+        if self.user is not None:
+            return self.user.email
+        else:
+            return self.guest_email
 
 class Category(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
@@ -94,9 +98,16 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=NOT_PAID_STATUS, null=False, blank=False)
 
     def __str__(self):
-        return str(self.customer.user.email + f" (status: {self.status})")
+        if self.transaction_id is None:
+            return "-"
+        return self.transaction_id
 
     def get_cart_total_price(self):
+        subtotal = self.get_cart_subtotal_price()
+        total = subtotal + Order.get_delivery_price(subtotal)
+        return round(total, 2)
+
+    def get_cart_subtotal_price(self):
         orderitems = self.order_items.all()
         return round(sum([item.get_total() for item in orderitems]), 2)
     
@@ -140,11 +151,12 @@ class OrderItem(models.Model):
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.PROTECT, null=True, blank=True)
-    address = models.CharField(max_length=200, null=True)
+    address = models.TextField(null=True)
     city = models.CharField(max_length=50, null=True)
     country = models.CharField(max_length=50, null=True)
-    zipcode = models.CharField(max_length=10, null=True)
+    postcode = models.CharField(max_length=10, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20, null=True)
 
     def __str__(self):
         return self.address

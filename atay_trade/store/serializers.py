@@ -28,15 +28,21 @@ class OrderSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     items_count = serializers.SerializerMethodField()
     delivery_price = serializers.SerializerMethodField()
+    subtotal = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
-        fields = ["total_price", "items_count", "order_items", "delivery_price"]
+        fields = ["total_price", "items_count", "order_items", "delivery_price", "subtotal"]
     
-    def get_total_price(self, obj):
-        return obj.get_cart_total_price()
+    def get_subtotal(self, obj):
+        return obj.get_cart_subtotal_price()
     
     def get_items_count(self, obj):
         return obj.get_cart_items_count()
     
     def get_delivery_price(self, obj):
-        return Order.get_delivery_price(obj.get_cart_total_price())
+        return Order.get_delivery_price(obj.get_cart_subtotal_price())
+    
+    def get_total_price(self, obj):
+        return round(self.get_delivery_price(obj) + self.get_subtotal(obj), 2)
+

@@ -62,7 +62,7 @@ $(document).ready(function(){
         $(".order-details-form").append(
             `<li><span>Subtotal</span> <span>£${subtotal}</span></li>
             <li><span>Shipping</span> <span>${deliveryPrice}</span></li>
-            <li><span>Total</span> <span>£${total}</span></li>`
+            <li><span>Total</span> <span class="checkout-total">£${total}</span></li>`
         );
     }
 
@@ -76,7 +76,7 @@ $(document).ready(function(){
 
                 $(".single-cart-item").remove();
                 if (data["subtotal"] !== undefined) {
-                    $('.subtotal').text("£" + data["subtotal"].toFixed(2))
+                    $('.subtotal').text("£" + data["subtotal"].toFixed(2));
                 }
                 $('.count-cart').text(data["items_count"]);
                 
@@ -294,15 +294,24 @@ $(document).ready(function(){
         })
     }
 
-    let priceFiltererForm = document.getElementsByClassName("price-filterer-form")[0]
+    let priceFiltererForm = document.getElementsByClassName("price-filterer-form")[0];
     if (priceFiltererForm != undefined) {
-        document.getElementsByClassName('price-filterer-form')[0].addEventListener('submit', function(e) {
+        priceFiltererForm.addEventListener('submit', function(e) {
             let rangePriceText =  document.getElementsByClassName('range-price')[0].textContent;
             rangePriceText = rangePriceText.slice(7).split("-");
             rangePriceText[0] = rangePriceText[0].trim().slice(1);
             rangePriceText[1] = rangePriceText[1].trim().slice(1);
             rangePriceText = rangePriceText.join("-");
             $(".priceRange").val(rangePriceText);
+        });
+    }
+
+    let checkoutPaymentForm = document.getElementsByClassName("checkout-payment-form")[0];
+    if (checkoutPaymentForm != undefined) {
+        checkoutPaymentForm.addEventListener('submit', function(e) {
+            let summaryTotal = document.getElementsByClassName("checkout-total")[0].textContent;
+            console.log("summaryTotal", summaryTotal);
+            $("input[name='total_price']").val(summaryTotal.slice(1));
         });
     }
     

@@ -20,6 +20,5 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(template_name="store/index.html"), name="logout"),
     path("wishlist/", views.wishlist, name="wishlist"),
     path("wishlist/add/", views.wishlistAdd),
-    path("wishlist/remove/", views.wishlistRemove),
-    path("orders/process", views.processOrder)
+    path("wishlist/remove/", views.wishlistRemove)
 ]

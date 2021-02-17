@@ -89,7 +89,7 @@ class CartList(APIView):
             
             dictResponse["delivery_price"] = Order.get_delivery_price(dictResponse["total_price"])
             dictResponse["subtotal"] = dictResponse["total_price"] 
-            dictResponse["total_price"] += dictResponse["delivery_price"]
+            dictResponse["total_price"] = dictResponse["delivery_price"] + dictResponse["subtotal"]
             return Response(dictResponse, status=status.HTTP_200_OK)
 
         customer = request.user.customer
@@ -140,15 +140,24 @@ def checkout(request):
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, status=Order.NOT_PAID_STATUS)
         order_items = order.order_items.all()
-        order_total = {'total_price': round(order.get_cart_total_price() + Order.get_delivery_price(order.get_cart_total_price()), 2), 
+        order_total = {'total_price': order.get_cart_total_price(), 
                        'items_count': order.get_cart_items_count(), 
-                       "delivery_price": Order.get_delivery_price(order.get_cart_total_price()),
-                       "subtotal" : order.get_cart_total_price()}
+                       "delivery_price": Order.get_delivery_price(order.get_cart_subtotal_price()),
+                       "subtotal" : order.get_cart_subtotal_price()}
+        customer = {'first_name': request.user.first_name, 'last_name': request.user.last_name, 'email' : request.user.email}
+        context = {'items': order_items, 'total' : order_total, 'customer': customer}
     else:
-        order_items = []
-        order_total = {'total_price': 0, 'items_count' : 0}
+        context = {}
 
-    context = {'items': order_items, 'total' : order_total }
+    result = processOrderForm(request)
+    if "error" in result:
+        context["error"] = result["error"]
+    if "success" in result:
+        context["success"] = result["success"]
+        response = render(request, "store/checkout.html", context)
+        response.delete_cookie("cart")
+        return response
+    
     return render(request, "store/checkout.html", context)
 
 def contact(request):
@@ -269,7 +278,10 @@ def account(request):
     for i,o in enumerate(orders, start=0):
         order_items = o.order_items.all()
         orders_with_order_items.append([0, 0])
-        status = 'PAID' if o.status == "P" else 'DELIVERED'
+        if o.status == "P":
+            status = 'PAID'
+        else:
+            status = 'DELIVERED'
         total_price = '£' + str(o.get_cart_total_price())
         orders_with_order_items[i][0] = (i+1, o.date_ordered.date(), o.transaction_id, status, total_price)
         orders_with_order_items[i][1] = order_items
@@ -326,15 +338,128 @@ def wishlistRemove(request):
 
     return JsonResponse({"status" : "API doesn't work that way"})
 
-def processOrder(request):
-    customer_name = "customer"
-    customer_email = "email"
-    #data = json.loads(request.body)
-    transaction_id = str(datetime.datetime.now().timestamp()) + str(customer_name + customer_email)
-    digest = hashlib.sha256(transaction_id.encode('utf-8')).hexdigest()
-    transaction_id = digest
-    print(transaction_id)
+def processOrderForm(request):
+    if request.method == "POST":
+        customer_first_name = request.POST.get("first_name")
+        customer_last_name = request.POST.get("last_name")
+        customer_email = request.POST.get("email_address")
+        customer_country = request.POST.get("country")
+        customer_address = request.POST.get("street_address")
+        customer_postcode = request.POST.get("postcode")
+        customer_city = request.POST.get("city")
+        customer_phone_number = request.POST.get("phone_number")
+        customer_total = request.POST.get("total_price") # this is not trusted
+        print("customer total", customer_total)
 
-    return JsonResponse({"status": "Not ready yet"})
+        if customer_first_name is None or customer_first_name.replace(" ", "") == "":
+            return {"error": "First name can not be empty!"}
+        if customer_last_name is None or customer_last_name.replace(" ", "") == "":
+            return {"error": "Last name can not be empty!"}
+        if customer_email is None or customer_email.replace(" ", "") == "":
+            return {"error": "Email can not be empty!"}
+        if customer_country is None or customer_country.replace(" ", "") == "":
+            return {"error": "Country can not be empty!"}
+        if customer_address is None or customer_address.replace(" ", "") == "":
+            return {"error": "Address can not be empty!"}
+        if customer_postcode is None or customer_address.replace(" ","") == "":
+            return {"error": "Postcode can not be empty!"}
+        if customer_city is None or customer_city.replace(" ","") == "":
+            return {"error": "City can not be empty!"}
+        if customer_phone_number is None or customer_phone_number.replace(" ","") == "":
+            return {"error": "Phone number can not be empty!"}        
+        if customer_total is None or customer_total.replace(" ", "") == "" or float(customer_total) == 0:
+            return {"error": "Your cart can not be empty!"}
+
+        customer_full_name = str(customer_first_name) + " " + str(customer_last_name)
+
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
+        else:
+            try:
+                cart = json.loads(request.COOKIES["cart"])
+            except Exception as e:
+                print("EXCEPTION OCCURED", e)
+                return {"error": e}
+            dictCart = {"total_price": 0, "items_count": 0, "order_items" : [], "delivery_price": 0}
+            for i in cart:
+                try:
+                    product = Product.objects.get(id=i)
+                    productImages = product.images.all()
+                    dictCart["order_items"].append({
+                        "product": {
+                            "id": product.id,
+                            "name": product.name,
+                            "price": product.price,
+                            "discounted_price": product.discounted_price,
+                            "model_number": product.model_number,
+                            "images": [
+                                { "image": productImages[0].image.url }
+                            ],
+                        }, 
+                        "quantity": cart[i]["quantity"],
+                    })
+                    dictCart["items_count"] += cart[i]["quantity"]
+                    if product.discounted_price is None:
+                        dictCart["total_price"] += round(product.price * cart[i]["quantity"], 2)
+                    else:
+                        dictCart["total_price"] += round(product.discounted_price * cart[i]["quantity"], 2)
+                    
+                except Exception as e:
+                    print("EXCEPTION OCCURED", e)
+                    return {"error": e}
+                
+                dictCart["delivery_price"] = Order.get_delivery_price(dictCart["total_price"])
+                dictCart["subtotal"] = dictCart["total_price"] 
+                dictCart["total_price"] += dictCart["delivery_price"]
+            
+            customer, created = Customer.objects.get_or_create(full_name=customer_full_name, guest_email = customer_email)
+            customer.save()
+            order = Order.objects.create(customer=customer, status=Order.NOT_PAID_STATUS)
+            
+            try:
+                for d in dictCart["order_items"]:
+                    product = Product.objects.get(id=d["product"]["id"])
+                    orderItem = OrderItem.objects.create(product=product, order=order, quantity=int(d["quantity"]))
+            except Exception as e:
+                print("EXCEPTION OCCURED", e)
+                return {"error": e}
+
+        transaction_key = str(datetime.datetime.now().timestamp()) + customer_full_name + customer_email
+        digest = hashlib.sha256(transaction_key.encode('utf-8')).hexdigest()
+        transaction_id = digest
+        order.transaction_id = transaction_id
+
+        print("YOUR ACTUAL TOTAL", float(order.get_cart_total_price()))
+        if float(customer_total) == float(order.get_cart_total_price()):
+            order.status = Order.PAID_STATUS
+            ShippingAddress.objects.create(customer=customer, 
+                                           order=order, 
+                                           address= customer_address, 
+                                           city= customer_city,
+                                           country= customer_country,
+                                           postcode= customer_postcode,
+                                           phone_number= customer_phone_number)
+            try:
+                if request.user.is_authenticated:
+                    order_items = order.order_items.all()
+                    for oi in order_items:
+                        product = Product.objects.get(id=oi.product.id)
+                        product.stock -= oi.quantity
+                        product.save(update_fields=["stock"])
+                else:
+                    for d in dictCart["order_items"]:
+                        product = Product.objects.get(id=d["product"]["id"])
+                        product.stock -= int(d["quantity"])
+                        product.save(update_fields=['stock'])
+            except:
+                return {"error": "Something went wrong during the payment process!"}
+        else:
+            return {"error": "Your payment has been rejected!"}
+
+        order.save()
+        return {"success": "You have successfully placed your order. Thanks for your purchase!"}
+
+    return {"error": None}
     
 
