@@ -376,6 +376,10 @@ def processOrderForm(request):
         if request.user.is_authenticated:
             customer = request.user.customer
             order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
+            order_items = order.order_items.all()
+            for oi in order_items:
+                if oi.quantity > oi.product.stock:
+                        return {"error": f'Sorry, we have only {oi.product.stock} {oi.product.name} in our stock'}
         else:
             try:
                 cart = json.loads(request.COOKIES["cart"])
@@ -421,6 +425,8 @@ def processOrderForm(request):
             try:
                 for d in dictCart["order_items"]:
                     product = Product.objects.get(id=d["product"]["id"])
+                    if int(d["quantity"]) > product.stock:
+                        return {"error": f'Sorry, we have only {product.stock} {product.name} in our stock'}
                     orderItem = OrderItem.objects.create(product=product, order=order, quantity=int(d["quantity"]))
             except Exception as e:
                 print("EXCEPTION OCCURED", e)
