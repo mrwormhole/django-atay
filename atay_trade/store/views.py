@@ -338,6 +338,7 @@ def wishlistRemove(request):
 
     return JsonResponse({"status" : "API doesn't work that way"})
 
+# TODO this is not a view, move to a proper file maybe? not forms.py and not utils.py, this seems like sort of validators.py
 def processOrderForm(request):
     if request.method == "POST":
         customer_first_name = request.POST.get("first_name")
