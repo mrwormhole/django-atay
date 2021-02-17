@@ -20,7 +20,7 @@
 
         <h2>{{ product.name }}</h2>
         
-        {% if product.stock != 0 %}
+        {% if product.stock == 0 %}
             <p style="color: red;"> The product is not in our inventory yet.</p>
         {% endif %}
 
@@ -36,7 +36,7 @@
 
         <div class="cart-fav-box d-flex align-items-center mt-50">
             <!-- Cart -->
-            {% if product.stock != 0 %}
+            {% if product.stock == 0 %}
                 <button disabled data-product="{{product.id}}" class="btn essence-btn add-cart">Out of stock</button>
             {% else %}
                 <button data-product="{{product.id}}" class="btn essence-btn add-cart">Add to Cart</button>    

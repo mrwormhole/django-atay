@@ -40,6 +40,17 @@ $(document).ready(function(){
         $(".order-details-form").append(
             `<li><span>Product</span> <span>Total</span></li>`
         );
+
+        let subtotal = data["subtotal"];
+        if (subtotal != undefined) {
+            subtotal = subtotal.toFixed(2);
+        }
+        let deliveryPrice = data["delivery_price"];
+        if (deliveryPrice == 0) { 
+            deliveryPrice = "Free"; 
+        } else {
+            deliveryPrice = "£" + deliveryPrice;
+        }
         let total = data["total_price"];
         let productsCount = data["order_items"].length;
         for(let i = 0; i < productsCount; i++) {
@@ -49,8 +60,8 @@ $(document).ready(function(){
             $(".order-details-form").append(`<li><span>${productName} X ${productQuantity}</span> <span>£${productPrice}</span></li>`);
         }
         $(".order-details-form").append(
-            `<li><span>Subtotal</span> <span>£${total}</span></li>
-            <li><span>Shipping</span> <span>Free</span></li>
+            `<li><span>Subtotal</span> <span>£${subtotal}</span></li>
+            <li><span>Shipping</span> <span>${deliveryPrice}</span></li>
             <li><span>Total</span> <span>£${total}</span></li>`
         );
     }
@@ -61,17 +72,21 @@ $(document).ready(function(){
             url: "http://localhost:8000/cart/",
             contentType: "application/json",
             success: function(data) {
-                $(".single-cart-item").remove();
-                $('.subtotal').text("£" + data["total_price"].toFixed(2))
-                $('.count-cart').text(data["items_count"]);
+                tidyCheckoutArea(data);
 
+                $(".single-cart-item").remove();
+                if (data["subtotal"] !== undefined) {
+                    $('.subtotal').text("£" + data["subtotal"].toFixed(2))
+                }
+                $('.count-cart').text(data["items_count"]);
+                
                 if (data["total_price"] !== undefined) {
                     $('.summary-total').text("£" + data["total_price"].toFixed(2));
                 }
                 if (data["delivery_price"] != 0) {
                     $('.delivery').text("£" + data["delivery_price"].toFixed(2));   
-                    let allTotal = (data["total_price"] + data["delivery_price"]).toFixed(2)
-                    $('.summary-total').text("£" + allTotal);
+                } else {
+                    $('.delivery').text("FREE"); 
                 }
 
                 let productsCount;
@@ -118,7 +133,7 @@ $(document).ready(function(){
                             if (guestCart[productID] != undefined) {
                                 delete guestCart[productID];
                                 document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
-                                console.log("GUEST CART", guestCart);
+                                populateTheCart()
                             }
                         } else {
                             console.log("deleting...");
@@ -130,7 +145,6 @@ $(document).ready(function(){
                                 success: function(data) {
                                     console.log(data);
                                     populateTheCart();
-                                    tidyCheckoutArea(data);
                                 },
                                 error: function(data, err) {
                                     console.log("ERR: ", err);

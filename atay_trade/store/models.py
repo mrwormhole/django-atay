@@ -90,7 +90,7 @@ class Order(models.Model):
     )
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, null=True, blank=True)
     date_ordered = models.DateTimeField(auto_now=True) # updatedAt date
-    transaction_id = models.CharField(max_length=100, null=True, unique=True)
+    transaction_id = models.TextField(null=True, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=NOT_PAID_STATUS, null=False, blank=False)
 
     def __str__(self):

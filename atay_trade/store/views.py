@@ -11,6 +11,8 @@ from .models import *
 from .serializers import *
 from .forms import *
 import json
+import datetime
+import hashlib
 
 def store(request):
     categories = Category.objects.all()
@@ -85,7 +87,9 @@ class CartList(APIView):
                     print("EXCEPTION OCCURED", e)
                     continue
             
-            dictResponse["delivery_price"] = Order.get_delivery_price(dictResponse["total_price"]) 
+            dictResponse["delivery_price"] = Order.get_delivery_price(dictResponse["total_price"])
+            dictResponse["subtotal"] = dictResponse["total_price"] 
+            dictResponse["total_price"] += dictResponse["delivery_price"]
             return Response(dictResponse, status=status.HTTP_200_OK)
 
         customer = request.user.customer
@@ -321,4 +325,16 @@ def wishlistRemove(request):
             return JsonResponse({"status" : "operation succeeded"})
 
     return JsonResponse({"status" : "API doesn't work that way"})
+
+def processOrder(request):
+    customer_name = "customer"
+    customer_email = "email"
+    #data = json.loads(request.body)
+    transaction_id = str(datetime.datetime.now().timestamp()) + str(customer_name + customer_email)
+    digest = hashlib.sha256(transaction_id.encode('utf-8')).hexdigest()
+    transaction_id = digest
+    print(transaction_id)
+
+    return JsonResponse({"status": "Not ready yet"})
+    
 
