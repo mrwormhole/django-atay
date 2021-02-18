@@ -1831,4 +1831,10 @@ img {
   color: #0315ff !important;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
 /* ##### The End ##### */
