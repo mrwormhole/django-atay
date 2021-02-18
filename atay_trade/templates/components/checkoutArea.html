@@ -3,21 +3,12 @@
     <div class="container">
 
         <div id="notification-danger" class="alert alert-danger d-none" role="alert">
-            Your order is not being confirmed! Please make sure that you fill <strong> all the fields</strong>.
+            Your order is not being confirmed! Please make sure that you fill all the fields.
         </div>
 
-        {% if error %}
-        <div class="alert alert-primary" role="alert">
-            {{error}}
+        <div id="notification-success" class="alert alert-danger d-none" role="alert">
+            You have successfully placed your order. Thanks for your purchase!
         </div>
-        {% endif %}
-        
-        {% if success %}
-        <div class="alert alert-success" role="alert">
-            {{success}}
-        </div>
-        {% endif %}
-            
 
         <div class="row">
 

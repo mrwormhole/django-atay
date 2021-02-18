@@ -148,16 +148,6 @@ def checkout(request):
         context = {'items': order_items, 'total' : order_total, 'customer': customer}
     else:
         context = {}
-
-    result = processOrderForm(request)
-    if "error" in result:
-        context["error"] = result["error"]
-    if "success" in result:
-        context["success"] = result["success"]
-        response = render(request, "store/checkout.html", context)
-        response.delete_cookie("cart")
-        return response
-    
     return render(request, "store/checkout.html", context)
 
 def contact(request):
@@ -338,81 +328,72 @@ def wishlistRemove(request):
 
     return JsonResponse({"status" : "API doesn't work that way"})
 
-# TODO this is not a view, move to a proper file maybe? not forms.py and not utils.py, this seems like sort of validators.py
-def processOrderForm(request):
+def processOrder(request):
     if request.method == "POST":
-        customer_first_name = request.POST.get("first_name")
-        customer_last_name = request.POST.get("last_name")
-        customer_email = request.POST.get("email_address")
-        customer_country = request.POST.get("country")
-        customer_address = request.POST.get("street_address")
-        customer_postcode = request.POST.get("postcode")
-        customer_city = request.POST.get("city")
-        customer_phone_number = request.POST.get("phone_number")
-        customer_total = request.POST.get("total_price") # this is not trusted
+        customer_data = json.loads(request.body)
+        customer_first_name = customer_data["firstName"]
+        customer_last_name = customer_data["lastName"]
+        customer_email = customer_data["emailAddress"]
+        customer_country = customer_data["country"]
+        customer_address = customer_data["streetAddress"]
+        customer_postcode = customer_data["postcode"]
+        customer_city = customer_data["city"]
+        customer_phone_number = customer_data["phoneNumber"]
+        customer_total = customer_data["totalPrice"] # this is not trusted
         print("customer total", customer_total)
 
+        print(customer_data)
+
+        # TODO clean up this mess
         if customer_first_name is None or customer_first_name.replace(" ", "") == "":
-            return {"error": "First name can not be empty!"}
+            return JsonResponse({"error": "First name can not be empty!"})
         if customer_last_name is None or customer_last_name.replace(" ", "") == "":
-            return {"error": "Last name can not be empty!"}
+            return JsonResponse({"error": "Last name can not be empty!"})
         if customer_email is None or customer_email.replace(" ", "") == "":
-            return {"error": "Email can not be empty!"}
+            return JsonResponse({"error": "Email can not be empty!"})
         if customer_country is None or customer_country.replace(" ", "") == "":
-            return {"error": "Country can not be empty!"}
+            return JsonResponse({"error": "Country can not be empty!"})
         if customer_address is None or customer_address.replace(" ", "") == "":
-            return {"error": "Address can not be empty!"}
+            return JsonResponse({"error": "Address can not be empty!"})
         if customer_postcode is None or customer_address.replace(" ","") == "":
-            return {"error": "Postcode can not be empty!"}
+            return JsonResponse({"error": "Postcode can not be empty!"})
         if customer_city is None or customer_city.replace(" ","") == "":
-            return {"error": "City can not be empty!"}
+            return JsonResponse({"error": "City can not be empty!"})
         if customer_phone_number is None or customer_phone_number.replace(" ","") == "":
-            return {"error": "Phone number can not be empty!"}        
+            return JsonResponse({"error": "Phone number can not be empty!"})      
         if customer_total is None or customer_total.replace(" ", "") == "" or float(customer_total) == 0:
-            return {"error": "Your cart can not be empty!"}
+            return JsonResponse({"error": "Your cart can not be empty!"})
 
         customer_full_name = str(customer_first_name) + " " + str(customer_last_name)
 
         if request.user.is_authenticated:
             customer = request.user.customer
             order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
-            order_items = order.order_items.all()
-            for oi in order_items:
-                if oi.quantity > oi.product.stock:
-                        return {"error": f'Sorry, we have only {oi.product.stock} {oi.product.name} in our stock'}
         else:
-            try:
-                cart = json.loads(request.COOKIES["cart"])
-            except Exception as e:
-                print("EXCEPTION OCCURED", e)
-                return {"error": e}
+            cart = json.loads(request.COOKIES["cart"])
             dictCart = {"total_price": 0, "items_count": 0, "order_items" : [], "delivery_price": 0}
             for i in cart:
-                try:
-                    product = Product.objects.get(id=i)
-                    productImages = product.images.all()
-                    dictCart["order_items"].append({
-                        "product": {
-                            "id": product.id,
-                            "name": product.name,
-                            "price": product.price,
-                            "discounted_price": product.discounted_price,
-                            "model_number": product.model_number,
-                            "images": [
-                                { "image": productImages[0].image.url }
-                            ],
-                        }, 
-                        "quantity": cart[i]["quantity"],
-                    })
-                    dictCart["items_count"] += cart[i]["quantity"]
-                    if product.discounted_price is None:
-                        dictCart["total_price"] += round(product.price * cart[i]["quantity"], 2)
-                    else:
-                        dictCart["total_price"] += round(product.discounted_price * cart[i]["quantity"], 2)
-                    
-                except Exception as e:
-                    print("EXCEPTION OCCURED", e)
-                    return {"error": e}
+                product = Product.objects.get(id=i)
+                productImages = product.images.all()
+                dictCart["order_items"].append({
+                    "product": {
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                        "discounted_price": product.discounted_price,
+                        "model_number": product.model_number,
+                        "images": [
+                            { "image": productImages[0].image.url }
+                        ],
+                    }, 
+                    "quantity": cart[i]["quantity"],
+                })
+                dictCart["items_count"] += cart[i]["quantity"]
+
+                if product.discounted_price is None:
+                    dictCart["total_price"] += round(product.price * cart[i]["quantity"], 2)
+                else:
+                    dictCart["total_price"] += round(product.discounted_price * cart[i]["quantity"], 2)
                 
                 dictCart["delivery_price"] = Order.get_delivery_price(dictCart["total_price"])
                 dictCart["subtotal"] = dictCart["total_price"] 
@@ -422,15 +403,9 @@ def processOrderForm(request):
             customer.save()
             order = Order.objects.create(customer=customer, status=Order.NOT_PAID_STATUS)
             
-            try:
-                for d in dictCart["order_items"]:
-                    product = Product.objects.get(id=d["product"]["id"])
-                    if int(d["quantity"]) > product.stock:
-                        return {"error": f'Sorry, we have only {product.stock} {product.name} in our stock'}
-                    orderItem = OrderItem.objects.create(product=product, order=order, quantity=int(d["quantity"]))
-            except Exception as e:
-                print("EXCEPTION OCCURED", e)
-                return {"error": e}
+            for d in dictCart["order_items"]:
+                product = Product.objects.get(id=d["product"]["id"])
+                orderItem = OrderItem.objects.create(product=product, order=order, quantity=int(d["quantity"]))
 
         transaction_key = str(datetime.datetime.now().timestamp()) + customer_full_name + customer_email
         digest = hashlib.sha256(transaction_key.encode('utf-8')).hexdigest()
@@ -447,26 +422,73 @@ def processOrderForm(request):
                                            country= customer_country,
                                            postcode= customer_postcode,
                                            phone_number= customer_phone_number)
-            try:
-                if request.user.is_authenticated:
-                    order_items = order.order_items.all()
-                    for oi in order_items:
-                        product = Product.objects.get(id=oi.product.id)
-                        product.stock -= oi.quantity
-                        product.save(update_fields=["stock"])
-                else:
-                    for d in dictCart["order_items"]:
-                        product = Product.objects.get(id=d["product"]["id"])
-                        product.stock -= int(d["quantity"])
-                        product.save(update_fields=['stock'])
-            except:
-                return {"error": "Something went wrong during the payment process!"}
+            if request.user.is_authenticated:
+                order_items = order.order_items.all()
+                for oi in order_items:
+                    product = Product.objects.get(id=oi.product.id)
+                    product.stock -= oi.quantity
+                    product.save(update_fields=["stock"])
+            else:
+                for d in dictCart["order_items"]:
+                    product = Product.objects.get(id=d["product"]["id"])
+                    product.stock -= int(d["quantity"])
+                    product.save(update_fields=['stock'])
         else:
-            return {"error": "Your payment has been rejected!"}
+            return JsonResponse({"message": "Your payment has been rejected due to the security policy!"})
 
         order.save()
-        return {"success": "You have successfully placed your order. Thanks for your purchase!"}
+        return JsonResponse({"success": "You have successfully placed your order. Thanks for your purchase!"})
 
-    return {"error": None}
+    return JsonResponse({"error": None})
     
+def checkStocks(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+                customer = request.user.customer
+                order, created = Order.objects.get_or_create(customer = customer, status=Order.NOT_PAID_STATUS)
+                order_items = order.order_items.all()
+                for oi in order_items:
+                    if oi.quantity > oi.product.stock:
+                            return JsonResponse({"message": f'Sorry, we have only {oi.product.stock} {oi.product.name} in our stock at the moment'})
+        else:
+            try:
+                cart = json.loads(request.COOKIES["cart"])
+            except Exception as e:
+                print("EXCEPTION OCCURED", e)
+                return JsonResponse({"error": e})
+            dictItems = {"order_items" : []}
+            for i in cart:
+                try:
+                    product = Product.objects.get(id=i)
+                    productImages = product.images.all()
+                    dictItems["order_items"].append({
+                        "product": {
+                            "id": product.id,
+                            "name": product.name,
+                            "price": product.price,
+                            "discounted_price": product.discounted_price,
+                            "model_number": product.model_number,
+                            "images": [
+                                { "image": productImages[0].image.url }
+                            ],
+                        }, 
+                        "quantity": cart[i]["quantity"],
+                    })
+                except Exception as e:
+                    print("EXCEPTION OCCURED", e)
+                    return JsonResponse({"error": e})
+            
+            try:
+                for d in dictItems["order_items"]:
+                    product = Product.objects.get(id=d["product"]["id"])
+                    if int(d["quantity"]) > product.stock:
+                        return JsonResponse({"message": f'Sorry, we have only {product.stock} {product.name} in our stock at the moment'})
+            except Exception as e:
+                print("EXCEPTION OCCURED", e)
+                return {"error": e}
+
+        return JsonResponse({"success": "We have enough stocks!"})
+
+    return JsonResponse({"error": None})
+        
 

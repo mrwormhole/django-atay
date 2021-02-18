@@ -63,7 +63,7 @@
                 {% for order_item in order_with_order_items|index:1 %}
                 <tr id="demo{{order_with_order_items|index:0|index:0}}" class="collapse {{should_show}} text-primary" style="background-color: #f0f0f0;">
                   <td colspan="1"></td>
-                  <td colspan="4"> <div class="">{{order_item.quantity}}X {{order_item.product.name}}(£{{order_item.product.price:floatformat:2}})</div> </td>
+                  <td colspan="4"> <div class="">{{order_item.quantity}}X {{order_item.product.name}}(£{{order_item.product.price|floatformat:2}})</div> </td>
                 </tr>
                 {% endfor %}
               {% endfor %}

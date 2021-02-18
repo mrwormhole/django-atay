@@ -20,7 +20,7 @@ $(document).ready(function(){
         guestCart = {};
         document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
     } 
-    console.log("GUEST CART:", guestCart)
+    console.log("GUEST CART:", guestCart);
 
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
