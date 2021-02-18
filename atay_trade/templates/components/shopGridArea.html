@@ -234,7 +234,7 @@
 
                                         {% if product.discounted_price %}
                                         <div class="product-badge offer-badge">
-                                            <span>-{{product.calculate_sale_percantage_number }}%</span>
+                                            <span>-{{product.calculate_sale_percantage_number}}%</span>
                                         </div>    
                                         {% endif %}
 
@@ -247,19 +247,17 @@
                                             
                                             
                                         {% if user.is_authenticated %}
-                
                                             {% if productWishlistStatuses|index:product.id %}
-                                            <!-- Favourite -->
-                                            <div class="product-favourite ml-4">
-                                                <a data-product="{{product.id}}" class="favme fa fa-heart active"></a>
-                                            </div>
+                                                <!-- Favourite -->
+                                                <div class="product-favourite ml-4">
+                                                    <a data-product="{{product.id}}" class="favme fa fa-heart active"></a>
+                                                </div>
                                             {% else %}
-                                            <!-- Favourite -->
-                                            <div class="product-favourite ml-4">
-                                                <a data-product="{{product.id}}" class="favme fa fa-heart"></a>
-                                            </div>
+                                                <!-- Favourite -->
+                                                <div class="product-favourite ml-4">
+                                                    <a data-product="{{product.id}}" class="favme fa fa-heart"></a>
+                                                </div>
                                             {% endif %}
-
                                         {% endif %}
                                     </div>
 
