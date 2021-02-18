@@ -7,4 +7,9 @@
     {% include 'components/breadcrumbArea.html' with title="checkout" uppercase=True %}
     {% include 'components/checkoutArea.html' %}    
 {% endblock store %}
+
+{% block scoped_js %}
+    <script type="text/javascript" src="{% static 'js/checkout.js' %}"></script>
+{% endblock scoped_js %}
+    
     
