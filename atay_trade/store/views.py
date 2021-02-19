@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404, redirect, reverse
-from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.db.models import Q
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.auth.decorators import login_required
@@ -24,23 +24,25 @@ def store(request):
     on_sale_products = Product.objects.exclude(discounted_price = None)[:8]
     
     productThumbnails = {}
-    for i in latest_arrived_products | on_sale_products:
-        qs = ProductThumbnail.objects.filter(product = i)
+    for p in latest_arrived_products | on_sale_products:
+        productThumbnails[p.id] = [0,0]
+        qs = ProductThumbnail.objects.filter(product = p)
         if len(qs) < 2:
-            return HttpResponse(f'<h1>Server Error! There should be at least 2 product thumbnails for a product! ({i.name})</h1>')
-        productThumbnails[i.id] = [0,0]
-        productThumbnails[i.id][0] = qs[0].resized_image.url
-        productThumbnails[i.id][1] = qs[1].resized_image.url
+            productThumbnails[p.id][0] = "/media/default_product_thumbnail_compressed.jpg"
+            productThumbnails[p.id][1] = "/media/default_product_thumbnail_compressed.jpg"
+            continue
+        productThumbnails[p.id][0] = qs[0].resized_image.url
+        productThumbnails[p.id][1] = qs[1].resized_image.url
 
     productWislistStatuses = {}
     if request.user.is_authenticated:
         customer = request.user.customer
-        for i in latest_arrived_products | on_sale_products:
-            qs = Wishlist.objects.filter(customer = customer, product = i)
+        for p in latest_arrived_products | on_sale_products:
+            qs = Wishlist.objects.filter(customer = customer, product = p)
             if len(qs) == 1:
-                productWislistStatuses[i.id] = True
+                productWislistStatuses[p.id] = True
             elif len(qs) == 0:
-                productWislistStatuses[i.id] = False   
+                productWislistStatuses[p.id] = False   
 
     context = {"categories": categories, 
                "categoryImages": categoryImages, 
@@ -156,7 +158,7 @@ def contact(request):
 
 def catalog(request, category = None):
     page = request.GET.get("page")
-    text = request.GET.get("search")
+    searchText = request.GET.get("search")
     sortBy = request.GET.get("sortBy")
     priceRange = request.GET.get("priceRange")
     maxPrice = 0
@@ -164,15 +166,15 @@ def catalog(request, category = None):
 
     categories = Category.objects.all()
     products = []
-    if text is not None and text != "":
+    if searchText is not None and searchText != "":
         vector = SearchVector("name", weight="A") + SearchVector("description", weight="B") + SearchVector("brand", weight="B")
-        query = SearchQuery(text)
+        query = SearchQuery(searchText)
         ''' Full text search on products name and description, and product should be in the stock '''
         products = Product.objects.annotate(rank = SearchRank(vector, query)).filter(Q(rank__gte=0.2) & Q(stock__gte=1)).order_by('-rank')
         #print(products.values_list('name', 'rank'))
     else:
         if sortBy == "sale":
-            products = Product.objects.exclude(Q(discounted_price=None) & ~Q(stock=0)).order_by("-discounted_price")
+            products = Product.objects.filter(Q(discounted_price__isnull = False) & Q(stock__gte = 0)).order_by("-discounted_price")
         elif sortBy == "toLowerPrice":
             products = Product.objects.filter(Q(stock__gte = 1)).order_by("-price")
         elif sortBy == "toHigherPrice":
@@ -185,15 +187,17 @@ def catalog(request, category = None):
         prices = priceRange.split("-")
         minPrice = float(prices[0])
         maxPrice = float(prices[1])
-        products = Product.objects.filter(Q(stock__gte = 1) & Q(price__gte = minPrice) & Q(price__lte=maxPrice)).order_by("price")
+        products = products.filter(Q(stock__gte = 1) & Q(price__gte = minPrice) & Q(price__lte=maxPrice)).order_by("price")
         sortBy = "toLowerPrice"
 
     productThumbnails = {}
     for p in products:
+        productThumbnails[p.id] = [0,0]
         qs = ProductThumbnail.objects.filter(product = p)
         if len(qs) < 2:
-            return HttpResponse(f'<h1>Server Error! There should be at least 2 product thumbnails for a product! ({p.name})</h1>')
-        productThumbnails[p.id] = [0,0]
+            productThumbnails[p.id][0] = "/media/default_product_thumbnail_compressed.jpg"
+            productThumbnails[p.id][1] = "/media/default_product_thumbnail_compressed.jpg"
+            continue
         productThumbnails[p.id][0] = qs[0].resized_image.url
         productThumbnails[p.id][1] = qs[1].resized_image.url
 
@@ -228,9 +232,15 @@ def catalog(request, category = None):
 
 def product(request, id):
     product = get_object_or_404(Product, pk=id)
-    qs = product.images.all()
-    if len(qs) < 2:
-        return HttpResponse(f'<h1>Server Error! There should be at least 2 product images for a product! ({product.name})</h1>')
+    productImages = product.images.all()
+    if len(productImages) < 2:
+        productImages = [{
+        "resized_image": {
+            "url": "/media/default_product_image_compressed.jpg" }
+        }, { 
+        "resized_image": {
+            "url": "/media/default_product_image_compressed.jpg" }
+        }]
 
     product = Product.objects.get(id = id)
     wishlist = []
@@ -242,7 +252,7 @@ def product(request, id):
     if len(wishlist) > 0:
         productWishlisted = True
 
-    context = {"product": product, "productImages": qs, "productWishlisted": productWishlisted}
+    context = {"product": product, "productImages": productImages, "productWishlisted": productWishlisted}
     return render(request, "store/product.html", context)
 
 def signup(request):
@@ -292,11 +302,12 @@ def wishlist(request):
     products = [w.product for w in wishlist]
     
     productThumbnails = {}
-    for i in products:
-        qs = ProductThumbnail.objects.filter(product = i)
+    for p in products:
+        qs = ProductThumbnail.objects.filter(product = p)
         if len(qs) < 1:
-            return HttpResponse(f'<h1>Server Error! There should be at least 1 product thumbnail for a product! ({i.name})</h1>')
-        productThumbnails[i.id] = qs[0].resized_image.url
+            productThumbnails[p.id] = "/media/default_product_thumbnail_compressed.jpg"
+            continue
+        productThumbnails[p.id] = qs[0].resized_image.url
 
     context = {"products": products, "productThumbnails": productThumbnails}
     return render(request, "store/wishlist.html", context)
@@ -342,9 +353,6 @@ def processOrder(request):
         customer_total = customer_data["totalPrice"] # this is not trusted
         print("customer total", customer_total)
 
-        print(customer_data)
-
-        # TODO clean up this mess
         if customer_first_name is None or customer_first_name.replace(" ", "") == "":
             return JsonResponse({"error": "First name can not be empty!"})
         if customer_last_name is None or customer_last_name.replace(" ", "") == "":

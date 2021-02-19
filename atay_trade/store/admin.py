@@ -23,7 +23,7 @@ class OrderAdmin(admin.ModelAdmin):
     actions = ["set_unpaid", "set_paid", "set_delivered",]
 
     def total_price(self, obj):
-            return "£" + str(obj.get_cart_total_price())
+            return f'£{obj.get_cart_total_price():.2f}'
     
     def customer_name(self, obj):
         if obj.customer.guest_email is None:

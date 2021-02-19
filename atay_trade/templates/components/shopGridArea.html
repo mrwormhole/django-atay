@@ -141,8 +141,8 @@
                             <div class="product-topbar d-flex align-items-center justify-content-between">
                                 <!-- Total Products -->
                                 <div class="total-products">
-                                    {% if products.paginator.count is None %}
-                                        <p><span>0</span> products found</p>
+                                    {% if products.paginator.count is None or products.paginator.count == 0  %}
+                                        <p> No products found</p>
                                     {% elif products.paginator.count == 1 %}
                                         <p><span>{{products.paginator.count}}</span> product found</p>
                                     {% else %}
