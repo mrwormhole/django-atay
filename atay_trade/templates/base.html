@@ -1,4 +1,5 @@
 {% load static %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,16 +16,17 @@
     <!-- Fontawesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/v4-shims.min.css" integrity="sha512-KNosrY5jkv7dI1q54vqk0N3x1xEmEn4sjzpU1lWL6bv5VVddcYKQVhHV08468FK6eBBSXTwGlMMZLPTXSpHYHA==" crossorigin="anonymous" />
-    <!-- Core Style CSS -->
-    <link rel="stylesheet" href="{% static 'css/core-style.css' %}">
     <!-- Custom Icon -->
     <link rel="icon" href="{% static 'img/core-img/favicon.ico' %}">
+    {% compress css %}
+        <!-- Core Style CSS -->
+        <link rel="stylesheet" href="{% static 'css/core-style.css' %}">
 
-    {% block scoped_css %}    
-    {% endblock scoped_css %}
+        {% block scoped_css %}    
+        {% endblock scoped_css %}
+    {% endcompress %}
 
     <script type="text/javascript">
-        // this is a trick to give user variable to jquery side
         var user = "{{request.user}}";
     </script>
 
@@ -59,6 +61,7 @@
     <!-- jQuery UI -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous"></script>
     <!-- Plugins js -->
+    {% compress js %}
     <script  type="text/javascript" src="{% static 'js/plugins.js' %}"></script>
     <!-- Classy Nav js -->
     <script  type="text/javascript" src="{% static 'js/classy-nav.min.js' %}"></script>
@@ -69,6 +72,7 @@
 
     {% block scoped_js %}    
     {% endblock scoped_js %}
+    {% endcompress %}
 
 </body>
 

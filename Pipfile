@@ -12,6 +12,7 @@ djangorestframework = "*"
 django-imagekit = "*"
 psycopg2 = "*"
 django-crispy-forms = "*"
+django-compressor = "*"
 
 [requires]
 python_version = "3.8"
