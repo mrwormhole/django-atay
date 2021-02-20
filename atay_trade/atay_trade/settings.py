@@ -14,8 +14,9 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+#BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print("BASE DIRECTORY IS:", BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -26,7 +27,7 @@ SECRET_KEY = 'j(y!mcs@nof%!m9ky6g76&xk(ywk*h6go!a@x92(ed8@55znp9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "188.34.201.92", "static.92.201.34.188.clients.your-server.de"]
 
 
 AUTH_USER_MODEL = 'store.CustomUser'
@@ -67,8 +68,8 @@ ROOT_URLCONF = 'atay_trade.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR), "templates"],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
+	'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -89,7 +90,7 @@ WSGI_APPLICATION = 'atay_trade.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'atay_trade_test',
+        'NAME': 'atay_trade_production',
         'USER': 'goldenhand',
         'PASSWORD': 'goldenhand',
         'HOST': '127.0.0.1',
@@ -139,12 +140,14 @@ STATIC_ROOT = os.path.join(STATIC_CDN_RESOURCES, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(STATIC_CDN_RESOURCES, "media")
 
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # other finders..
     'compressor.finders.CompressorFinder',
 )
+
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
