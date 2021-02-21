@@ -13,7 +13,7 @@ var paymentFormData = {
 function getStockStatus(data) {
     return $.ajax({
         type: "POST",
-        url: "http://localhost:8000/stocks/check/",
+        url: `${DOMAIN_URL}/stocks/check/`,
         data: JSON.stringify(data),
         contentType: "application/json"
     });
@@ -66,13 +66,13 @@ function initPayPalButton() {
             return actions.order.capture().then(function(details) {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:8000/checkout/",
+                    url: `${DOMAIN_URL}/checkout/`,
                     data: JSON.stringify(paymentFormData),
                     contentType: "application/json",
                     success: function() {
                         $.ajax({
                             type: "POST",
-                            url: "http://localhost:8000/orders/process/",
+                            url: `${DOMAIN_URL}/orders/process/`,
                             data: JSON.stringify(paymentFormData),
                             contentType: "application/json",
                             success: function(orderStatus) {
