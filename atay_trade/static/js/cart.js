@@ -138,7 +138,7 @@ function onClickRemoveButton(e) {
 function populateTheCart() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8000/cart/",
+        url: `${DOMAIN_URL}/cart/`,
         contentType: "application/json",
         success: function(data) {
             tidyCheckoutArea(data);
