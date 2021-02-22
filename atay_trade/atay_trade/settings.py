@@ -26,7 +26,7 @@ SECRET_KEY = 'j(y!mcs@nof%!m9ky6g76&xk(ywk*h6go!a@x92(ed8@55znp9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["www.ataytrade.co.uk", "localhost", "127.0.0.1", "188.34.201.92"]
+ALLOWED_HOSTS = ["ataytrade.co.uk", "www.ataytrade.co.uk", "localhost", "127.0.0.1", "188.34.201.92"]
 
 
 AUTH_USER_MODEL = 'store.CustomUser'

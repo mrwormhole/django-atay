@@ -1,6 +1,6 @@
 var csrftoken = getCookie('csrftoken'); //global csrfToken
 var guestCart = JSON.parse(getCookie('cart')); //global cart cookie for guests
-const DOMAIN_URL = "http://ataytrade.co.uk"; //domain URL, http://localhost:8000
+const DOMAIN_URL = "https://www.ataytrade.co.uk"; //domain URL, http://localhost:8000
 
 function getCookie(name) {
     let cookieValue = null;
@@ -20,7 +20,7 @@ function getCookie(name) {
 
 if (guestCart == undefined) {
     guestCart = {};
-    document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+    document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/;samesite=lax;secure";
 } 
 console.log("GUEST CART:", guestCart);
 
@@ -88,7 +88,7 @@ function onClickAddButton(e) {
             guestCart[productID]['quantity'] += 1;
         }
         console.log("GUEST CART", guestCart);
-        document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+        document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/;samesite=lax;secure";
         populateTheCart();
     } else {
         $.ajax({
@@ -115,7 +115,7 @@ function onClickRemoveButton(e) {
     if (user == "AnonymousUser") {
         if (guestCart[productID] != undefined) {
             delete guestCart[productID];
-            document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+            document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/;samesite=lax;secure";
             populateTheCart();
         }
     } else {
