@@ -1,6 +1,6 @@
 var csrftoken = getCookie('csrftoken'); //global csrfToken
 var guestCart = JSON.parse(getCookie('cart')); //global cart cookie for guests
-const DOMAIN_URL = "http://ataytrade.co.uk"; //domain URL, http://localhost:8000
+const DOMAIN_URL = "http://www.ataytrade.co.uk"; //domain URL, http://localhost:8000
 
 function getCookie(name) {
     let cookieValue = null;
