@@ -88,7 +88,7 @@ function onClickAddButton(e) {
             guestCart[productID]['quantity'] += 1;
         }
         console.log("GUEST CART", guestCart);
-        document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+        document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/;samesite=lax;secure";
         populateTheCart();
     } else {
         $.ajax({
@@ -115,7 +115,7 @@ function onClickRemoveButton(e) {
     if (user == "AnonymousUser") {
         if (guestCart[productID] != undefined) {
             delete guestCart[productID];
-            document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/";
+            document.cookie = "cart=" + JSON.stringify(guestCart) + ";domain=;path=/;samesite=lax;secure";
             populateTheCart();
         }
     } else {
