@@ -89,7 +89,7 @@ function initPayPalButton() {
                                     notificationSuccess.text(orderStatus["success"]);
                                     notificationSuccess.attr("class", "alert alert-success");
                                     notificationDanger.attr("class", "alert alert-danger d-none");
-                                    document.cookie = "cart=" + ";domain=;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+                                    document.cookie = "cart=" + ";domain=;path=/;samesite=lax;secure;expires=Thu, 01 Jan 1970 00:00:01 GMT";
                                 }
                                 clearBillingForm();
                                 populateTheCart();
