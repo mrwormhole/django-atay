@@ -1,5 +1,6 @@
 var csrftoken = getCookie('csrftoken'); //global csrfToken
 var guestCart = JSON.parse(getCookie('cart')); //global cart cookie for guests
+const DOMAIN_URL = "http://ataytrade.co.uk"; //domain URL, http://localhost:8000
 
 function getCookie(name) {
     let cookieValue = null;
@@ -92,7 +93,7 @@ function onClickAddButton(e) {
     } else {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8000/cart/add/",
+            url: `${DOMAIN_URL}/cart/add/`,
             data: JSON.stringify({"productID": productID}),
             contentType: "application/json",
             success: function(data) {
@@ -120,7 +121,7 @@ function onClickRemoveButton(e) {
     } else {
         $.ajax({
             type: "DELETE",
-            url: "http://localhost:8000/cart/remove/",
+            url: `${DOMAIN_URL}/cart/remove/`,
             data: JSON.stringify({"productID": productID}),
             contentType: "application/json",
             success: function(data) {
@@ -137,7 +138,7 @@ function onClickRemoveButton(e) {
 function populateTheCart() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8000/cart/",
+        url: `${DOMAIN_URL}/cart/`,
         contentType: "application/json",
         success: function(data) {
             tidyCheckoutArea(data);
@@ -221,7 +222,7 @@ $(document).ready(function(){
     function addToWishlist(productID, heartIndex = undefined, toggleClassListForButtons = false) {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8000/wishlist/add/",
+            url: `${DOMAIN_URL}/wishlist/add/`,
             data: JSON.stringify({"productID": productID}),
             contentType: "application/json",
             success: function() {
@@ -242,7 +243,7 @@ $(document).ready(function(){
     function removeFromWishlist(productID, heartIndex, toggleClassListForButtons = false) {
         $.ajax({
             type: "DELETE",
-            url: "http://localhost:8000/wishlist/remove/",
+            url: `${DOMAIN_URL}/wishlist/remove/`,
             data: JSON.stringify({"productID": productID}),
             contentType: "application/json",
             success: function() {
