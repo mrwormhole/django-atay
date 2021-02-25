@@ -1,6 +1,7 @@
 var csrftoken = getCookie('csrftoken'); //global csrfToken
 var guestCart = JSON.parse(getCookie('cart')); //global cart cookie for guests
-const DOMAIN_URL = "https://www.ataytrade.co.uk"; //domain URL, http://localhost:8000
+const DOMAIN_URL = window.location.origin //"https://www.ataytrade.co.uk"; //domain URL, http://localhost:8000
+console.log(DOMAIN_URL)
 
 function getCookie(name) {
     let cookieValue = null;
@@ -79,7 +80,6 @@ function tidyCheckoutArea(data) {
 function onClickAddButton(e) {
     e.preventDefault();
     let productID = this.dataset.product;
-
     console.log("user:", user);
     if (user == "AnonymousUser") {
         if (guestCart[productID] == undefined) {
@@ -101,7 +101,7 @@ function onClickAddButton(e) {
                 populateTheCart();
             },
             error: function(data, err) {
-                console.log("ERR: ", err);
+                console.log("ERR: ", err)
             }
         });
     }
