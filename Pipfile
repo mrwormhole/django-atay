@@ -13,6 +13,7 @@ django-imagekit = "*"
 psycopg2 = "*"
 django-crispy-forms = "*"
 django-compressor = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.8"
