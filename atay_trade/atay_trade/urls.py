@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
+    path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
     path('master/', admin.site.urls),
     path("", include("store.urls")),
 ]

@@ -1837,4 +1837,15 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0; 
 }
 
+.dynamic-width {
+  width: 200px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+  .dynamic-width {
+    width: 100px;
+    margin-bottom: 0px;
+  }
+}
 /* ##### The End ##### */

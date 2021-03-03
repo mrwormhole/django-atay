@@ -28,13 +28,19 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["ataytrade.co.uk", "www.ataytrade.co.uk", "localhost", "127.0.0.1", "188.34.201.92"]
 
-
 AUTH_USER_MODEL = 'store.CustomUser'
 LOGIN_REDIRECT_URL = 'store:account'
 LOGIN_URL = 'store:login'
 LOGOUT_REDIRECT_URL = 'store:store'
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "ataycommerce@gmail.com"
+EMAIL_HOST_PASSWORD = "123abc456xyz"
 
 # Application definition
 INSTALLED_APPS = [
@@ -45,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'admin_honeypot',
     'corsheaders',
     'rest_framework',
     'imagekit',

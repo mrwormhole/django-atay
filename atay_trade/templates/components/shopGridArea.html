@@ -136,7 +136,7 @@
 
             <div class="col-12 col-md-8 col-lg-9">
                 <div class="shop_grid_product_area">
-                    <div class="row">
+                    <div class="row" style="margin-left: 0;margin-right: 0;">
                         <div class="col-12">
                             <div class="product-topbar d-flex align-items-center justify-content-between">
                                 <!-- Total Products -->
@@ -160,23 +160,23 @@
                                             {% if sortBy == "sale" %}
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: High</option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% elif sortBy == "toLowerPrice" %}
-                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toLowerPrice">Price: High</option>
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% elif sortBy == "toHigherPrice" %}
-                                            <option value="toHigherPrice">Price: £ - £££</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: High</option>
+                                            <option value="toLowerPrice">Price: Low</option>
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
                                             {% else %}
                                             <option value="new">Newest</option>
                                             <option value="sale">Sale</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: High/option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% endif %}
                                                 
                                         </select>
@@ -189,23 +189,23 @@
                                             {% if sortBy == "sale" %}
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: High</option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% elif sortBy == "toLowerPrice" %}
-                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toLowerPrice">Price: High</option>
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% elif sortBy == "toHigherPrice" %}
-                                            <option value="toHigherPrice">Price: £ - £££</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
+                                            <option value="toHigherPrice">Price: Low</option>
+                                            <option value="toLowerPrice">Price: High</option>
                                             <option value="sale">Sale</option>
                                             <option value="new">Newest</option>
                                             {% else %}
                                             <option value="new">Newest</option>
                                             <option value="sale">Sale</option>
-                                            <option value="toLowerPrice">Price: £££ - £</option>
-                                            <option value="toHigherPrice">Price: £ - £££</option>
+                                            <option value="toLowerPrice">Price: High</option>
+                                            <option value="toHigherPrice">Price: Low</option>
                                             {% endif %}
                                                 
                                         </select>

@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from .models import *
 from .serializers import *
 from .forms import *
+from .utils import render_to_pdf, send_invoice_to_email
 import json
 import datetime
 import hashlib
@@ -211,7 +212,7 @@ def catalog(request, category = None):
             elif len(qs) == 0:
                 productWislistStatuses[p.id] = False 
 
-    categoryName = None
+    categoryName = None # todo remove this is useless declaration
     if category is not None and category != "":
         categoryName = category
         products = products.filter(Q(category__name__icontains = category))
@@ -445,6 +446,7 @@ def processOrder(request):
             return JsonResponse({"message": "Your payment has been rejected due to the security policy!"})
 
         order.save()
+        send_invoice_to_email(f'https://ataytrade.co.uk/invoices/{transaction_id}?download=true', customer_full_name, customer_email, "Your Purchase From Atay Trade")
         return JsonResponse({"success": "You have successfully placed your order. Thanks for your purchase!"})
 
     return JsonResponse({"error": None})
@@ -499,4 +501,22 @@ def checkStocks(request):
 
     return JsonResponse({"error": None})
         
-
+def invoice(request, transaction_id):
+    order = get_object_or_404(Order, transaction_id=transaction_id)
+    order_items = order.order_items.all()
+    shipping_address = ShippingAddress.objects.get(order_id = order.id)
+    context = {"order": order, 
+        "order_items": order_items, 
+        "total_price": order.get_cart_total_price(), 
+        "items_count": order.get_cart_items_count(),
+        "delivery_price": Order.get_delivery_price(order.get_cart_subtotal_price()),
+        "shipping_address": shipping_address}
+    pdf = render_to_pdf("invoice.html", context)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    filename = "Invoice_%s.pdf" %(order.transaction_id)
+    content = "inline; filename=%s" %(filename)
+    download = request.GET.get("download")
+    if download:
+        content = "attachment; filename=%s" %(filename)
+    response['Content-Disposition'] = content
+    return response

@@ -22,5 +22,6 @@ urlpatterns = [
     path("wishlist/add/", views.wishlistAdd),
     path("wishlist/remove/", views.wishlistRemove),
     path("orders/process/", views.processOrder),
-    path("stocks/check/", views.checkStocks)
+    path("stocks/check/", views.checkStocks),
+    path("invoices/<str:transaction_id>", views.invoice, name="invoice")
 ]
