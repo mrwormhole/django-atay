@@ -215,7 +215,7 @@ def catalog(request, category = None):
     categoryName = None # todo remove this is useless declaration
     if category is not None and category != "":
         categoryName = category
-        products = products.filter(Q(category__name__icontains = category))
+        products = products.filter(Q(category__name__iexact = category))
 
     paginator = Paginator(products, 6)
     products = paginator.get_page(page)
