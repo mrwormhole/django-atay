@@ -1,0 +1,8 @@
+Emails are in gmail free tier[Business Email SMTP change]
+https://www.lifewire.com/what-are-the-yandex-mail-smtp-settings-1171304
+https://gist.github.com/nskeip/2843522
+
+Price change affects invoices????[CRITICAL]
+payment completed green[UX feature]
+ongoing sales title show up when items are not on sale????[UI issue]
+Categories doesn't appear on navbar????[UI issue]
